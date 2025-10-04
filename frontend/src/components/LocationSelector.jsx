@@ -68,14 +68,13 @@ const LocationSelector = ({ onLocationChange, currentLocation }) => {
       {/* Trigger Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center space-x-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 rounded-lg transition-all shadow-lg"
+        className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white rounded-lg transition-all shadow-lg hover:shadow-xl"
       >
         <Globe className="w-5 h-5" />
         <span className="font-medium">
           {currentLocation?.city || `${currentLocation?.lat?.toFixed(2)}, ${currentLocation?.lon?.toFixed(2)}`}
         </span>
       </button>
-
       {/* Modal */}
       <AnimatePresence>
         {isOpen && (

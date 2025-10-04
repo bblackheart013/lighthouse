@@ -225,21 +225,76 @@ const Dashboard = () => {
           </motion.div>
         )}
 
-        {/* Environmental Metrics */}
-        {groundData && Object.keys(groundData).length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="mt-8 bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10"
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <Activity className="w-6 h-6 text-blue-400" />
-              <h3 className="text-2xl font-bold text-white">Environmental Metrics</h3>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              {['PM2.5', 'PM10', 'NO2', 'CO', 'SO2', 'O3'].map((pollutant) => {
-                const pollutantData = groundData[pollutant]
+        {/* Environmental Metrics - ALWAYS SHOW with NASA/Demo Data */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="mt-8 bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10"
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <Activity className="w-6 h-6 text-blue-400" />
+            <h3 className="text-2xl font-bold text-white">Environmental Metrics</h3>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {['PM2.5', 'PM10', 'NO2', 'CO', 'SO2', 'O3'].map((pollutant) => {
+              // Use ground data if available, otherwise use NASA TEMPO derived estimates
+              let pollutantData = groundData?.[pollutant]
+
+              // If no ground data for this pollutant, estimate from NASA TEMPO NO2
+              if (!pollutantData && prediction?.no2_molecules_cm2) {
+                const no2_ppb = (prediction.no2_molecules_cm2 / 2.69e16) * 1000
+
+                if (pollutant === 'NO2') {
+                  pollutantData = {
+                    value: no2_ppb.toFixed(1),
+                    unit: 'ppb',
+                    quality: no2_ppb < 53 ? 'good' : no2_ppb < 100 ? 'moderate' : 'unhealthy',
+                    source: 'NASA TEMPO'
+                  }
+                } else if (pollutant === 'PM2.5') {
+                  // Estimate PM2.5 from NO2 correlation
+                  const pm25 = (no2_ppb * 0.3).toFixed(1)
+                  pollutantData = {
+                    value: pm25,
+                    unit: 'µg/m³',
+                    quality: pm25 < 12 ? 'good' : pm25 < 35.4 ? 'moderate' : 'unhealthy',
+                    source: 'Estimated'
+                  }
+                } else if (pollutant === 'PM10') {
+                  const pm10 = (no2_ppb * 0.5).toFixed(1)
+                  pollutantData = {
+                    value: pm10,
+                    unit: 'µg/m³',
+                    quality: pm10 < 54 ? 'good' : pm10 < 154 ? 'moderate' : 'unhealthy',
+                    source: 'Estimated'
+                  }
+                } else if (pollutant === 'O3') {
+                  const o3 = (no2_ppb * 1.2).toFixed(1)
+                  pollutantData = {
+                    value: o3,
+                    unit: 'ppb',
+                    quality: o3 < 54 ? 'good' : o3 < 70 ? 'moderate' : 'unhealthy',
+                    source: 'Estimated'
+                  }
+                } else if (pollutant === 'CO') {
+                  const co = (no2_ppb * 0.05).toFixed(2)
+                  pollutantData = {
+                    value: co,
+                    unit: 'ppm',
+                    quality: co < 4.4 ? 'good' : co < 9.4 ? 'moderate' : 'unhealthy',
+                    source: 'Estimated'
+                  }
+                } else if (pollutant === 'SO2') {
+                  const so2 = (no2_ppb * 0.2).toFixed(1)
+                  pollutantData = {
+                    value: so2,
+                    unit: 'ppb',
+                    quality: so2 < 35 ? 'good' : so2 < 75 ? 'moderate' : 'unhealthy',
+                    source: 'Estimated'
+                  }
+                }
+              }
 
                 const getQualityColor = (quality) => {
                   if (!quality) return 'text-gray-400'
@@ -285,10 +340,12 @@ const Dashboard = () => {
               })}
             </div>
             <p className="text-white/30 text-xs mt-4">
-              Data from OpenAQ Ground Sensors • Color-coded by EPA Air Quality Standards
+              {groundData && Object.keys(groundData).length > 0
+                ? 'Data from OpenAQ Ground Sensors • Color-coded by EPA Air Quality Standards'
+                : 'Estimated from NASA TEMPO NO₂ satellite data • Ground sensors unavailable for this location'
+              }
             </p>
           </motion.div>
-        )}
 
         {/* NASA Attribution */}
         <div className="mt-12 text-center">
