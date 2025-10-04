@@ -16,25 +16,25 @@
 
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
-import { TrendingUp, AlertTriangle, CheckCircle, Info } from 'lucide-react'
+import { TrendingUp, AlertTriangle, CheckCircle, Info, CloudOff } from 'lucide-react'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { apiService } from '../services/api'
 import { getAQIColor, getAQICategory } from '../utils/aqi'
+import { useLocation } from '../context/LocationContext'
 
 const Forecast = () => {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const { location } = useLocation()
 
-  const lat = import.meta.env.VITE_DEFAULT_LAT || '34.05'
-  const lon = import.meta.env.VITE_DEFAULT_LON || '-118.24'
+  const { lat, lon, city } = location
 
   useEffect(() => {
     const fetchForecast = async () => {
       try {
         setLoading(true)
-        const forecast = await apiService.getForecast(lat, lon)
+        const forecast = await apiService.getForecast(lat, lon, city)
         setData(forecast)
       } catch (err) {
         console.error('Forecast fetch failed:', err)
@@ -45,7 +45,7 @@ const Forecast = () => {
     }
 
     fetchForecast()
-  }, [lat, lon])
+  }, [lat, lon, city])
 
   if (loading) return <LoadingSpinner message="Computing 24-hour forecast..." />
 
@@ -61,53 +61,28 @@ const Forecast = () => {
     )
   }
 
-  // Transform data for Recharts
-  const chartData = data.predictions.map(pred => ({
-    time: new Date(pred.timestamp).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      hour12: true
-    }),
-    aqi: Math.round(pred.aqi),
-    temperature: Math.round(pred.temperature),
-    humidity: Math.round(pred.humidity),
-    fullTimestamp: pred.timestamp
-  }))
-
-  // Calculate statistics
-  const maxAQI = Math.max(...chartData.map(d => d.aqi))
-  const minAQI = Math.min(...chartData.map(d => d.aqi))
-  const avgAQI = Math.round(chartData.reduce((sum, d) => sum + d.aqi, 0) / chartData.length)
-
-  // Custom tooltip for the chart
-  const CustomTooltip = ({ active, payload }) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload
-      const category = getAQICategory(data.aqi)
-
-      return (
-        <div className="bg-white border-2 border-slate-200 rounded-lg shadow-xl p-4">
-          <p className="font-semibold text-slate-700 mb-2">{data.time}</p>
-          <div
-            className="text-2xl font-bold mb-2"
-            style={{ color: getAQIColor(data.aqi) }}
-          >
-            AQI: {data.aqi}
-          </div>
-          <p className="text-sm text-slate-600 mb-1">{category.label}</p>
-          <div className="text-xs text-slate-500 space-y-1 mt-2 pt-2 border-t">
-            <p>Temp: {data.temperature}°F</p>
-            <p>Humidity: {data.humidity}%</p>
-          </div>
+  if (!data || !data.prediction) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
+          <CloudOff className="mx-auto mb-4 text-yellow-500" size={48} />
+          <h2 className="text-2xl font-bold text-yellow-700 mb-2">No Forecast Data</h2>
+          <p className="text-yellow-600">Unable to generate forecast for this location.</p>
         </div>
-      )
-    }
-    return null
+      </div>
+    )
   }
+
+  const { prediction, health_guidance } = data
+  const aqi = prediction.aqi
+  const category = prediction.category
+  const confidence = prediction.confidence
+  const riskLevel = prediction.risk_level
 
   // Determine overall forecast sentiment
   const getForecastSentiment = () => {
-    if (avgAQI <= 50) return { icon: CheckCircle, color: 'green', message: 'Excellent air quality expected' }
-    if (avgAQI <= 100) return { icon: Info, color: 'yellow', message: 'Moderate conditions ahead' }
+    if (aqi <= 50) return { icon: CheckCircle, color: 'green', message: 'Excellent air quality expected' }
+    if (aqi <= 100) return { icon: Info, color: 'yellow', message: 'Moderate conditions ahead' }
     return { icon: AlertTriangle, color: 'red', message: 'Poor air quality forecasted' }
   }
 
@@ -126,41 +101,40 @@ const Forecast = () => {
           24-Hour Forecast
         </h1>
         <p className="text-slate-600 text-lg">
-          {data.location} • Next 24 Hours
+          {data.location?.city || `${data.location?.lat}, ${data.location?.lon}`} • Next 24 Hours
         </p>
       </div>
 
       {/* Forecast Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        {/* Average AQI */}
+        {/* Predicted AQI */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-xl shadow-lg p-6"
         >
-          <h3 className="text-sm font-medium text-slate-600 mb-2">Average AQI</h3>
+          <h3 className="text-sm font-medium text-slate-600 mb-2">Predicted AQI</h3>
           <p
             className="text-4xl font-bold"
-            style={{ color: getAQIColor(avgAQI) }}
+            style={{ color: getAQIColor(aqi) }}
           >
-            {avgAQI}
+            {Math.round(aqi)}
           </p>
+          <p className="text-sm text-slate-600 mt-2">{category}</p>
         </motion.div>
 
-        {/* Peak AQI */}
+        {/* NO2 Levels */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="bg-white rounded-xl shadow-lg p-6"
         >
-          <h3 className="text-sm font-medium text-slate-600 mb-2">Peak AQI</h3>
-          <p
-            className="text-4xl font-bold"
-            style={{ color: getAQIColor(maxAQI) }}
-          >
-            {maxAQI}
+          <h3 className="text-sm font-medium text-slate-600 mb-2">NO2 Levels</h3>
+          <p className="text-4xl font-bold text-blue-600">
+            {prediction.no2_molecules_cm2 ? prediction.no2_molecules_cm2.toExponential(2) : 'N/A'}
           </p>
+          <p className="text-xs text-slate-600 mt-2">molecules/cm²</p>
         </motion.div>
 
         {/* Confidence Score */}
@@ -171,8 +145,8 @@ const Forecast = () => {
           className="bg-white rounded-xl shadow-lg p-6"
         >
           <h3 className="text-sm font-medium text-slate-600 mb-2">Confidence</h3>
-          <p className="text-4xl font-bold text-blue-600">
-            {Math.round(data.confidence * 100)}%
+          <p className="text-4xl font-bold text-purple-600 capitalize">
+            {confidence}
           </p>
         </motion.div>
 
@@ -185,7 +159,7 @@ const Forecast = () => {
         >
           <h3 className="text-sm font-medium text-slate-600 mb-2">Risk Level</h3>
           <p className="text-2xl font-bold text-slate-700 uppercase">
-            {data.predictions[0].risk_level}
+            {riskLevel}
           </p>
         </motion.div>
       </div>
@@ -204,73 +178,55 @@ const Forecast = () => {
               {sentiment.message}
             </h3>
             <p className={`text-${sentiment.color}-600`}>
-              Range: {minAQI} - {maxAQI} AQI over the next 24 hours
+              24-hour ahead prediction for your location
             </p>
           </div>
         </div>
       </motion.div>
 
-      {/* Main Chart */}
+      {/* Health Guidance */}
+      {health_guidance && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="bg-white rounded-xl shadow-lg p-8 mb-8"
+        >
+          <h2 className="text-2xl font-bold text-slate-800 mb-6">
+            Health Guidance
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-semibold text-slate-700 mb-2">General Public</h3>
+              <p className="text-slate-600">{health_guidance.general_public}</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-slate-700 mb-2">Sensitive Groups</h3>
+              <p className="text-slate-600">{health_guidance.sensitive_groups}</p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Data Sources Information */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="bg-white rounded-xl shadow-lg p-6 mb-8"
+        transition={{ delay: 0.6 }}
+        className="bg-slate-50 border border-slate-200 rounded-xl p-6"
       >
-        <h2 className="text-2xl font-bold text-slate-800 mb-6">
-          AQI Trend
-        </h2>
-
-        <ResponsiveContainer width="100%" height={400}>
-          <AreaChart data={chartData}>
-            <defs>
-              {/* Gradient for area fill */}
-              <linearGradient id="aqiGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
-              </linearGradient>
-            </defs>
-
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-
-            <XAxis
-              dataKey="time"
-              stroke="#64748b"
-              style={{ fontSize: '12px' }}
-            />
-
-            <YAxis
-              stroke="#64748b"
-              style={{ fontSize: '12px' }}
-              label={{ value: 'AQI', angle: -90, position: 'insideLeft' }}
-            />
-
-            {/* Reference lines for AQI thresholds */}
-            <ReferenceLine y={50} stroke="#22c55e" strokeDasharray="3 3" label="Good" />
-            <ReferenceLine y={100} stroke="#eab308" strokeDasharray="3 3" label="Moderate" />
-            <ReferenceLine y={150} stroke="#f97316" strokeDasharray="3 3" label="USG" />
-
-            <Tooltip content={<CustomTooltip />} />
-
-            <Area
-              type="monotone"
-              dataKey="aqi"
-              stroke="#3b82f6"
-              strokeWidth={3}
-              fill="url(#aqiGradient)"
-              animationDuration={1000}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </motion.div>
-
-      {/* Model Information */}
-      <div className="text-center text-sm text-slate-500">
-        <p>
-          Forecast generated by {data.model_version} •
-          Updated {new Date(data.predictions[0].timestamp).toLocaleString()}
+        <h3 className="text-lg font-bold text-slate-800 mb-3">
+          About This Forecast
+        </h3>
+        <p className="text-slate-700 leading-relaxed mb-4">
+          This 24-hour forecast is generated using NASA TEMPO satellite data combined with
+          machine learning models trained on historical air quality patterns. The prediction
+          takes into account NO2 levels, meteorological conditions, and regional patterns.
         </p>
-      </div>
+        <div className="text-sm text-slate-600">
+          <p>Data from NASA TEMPO Satellite • Updated in real-time</p>
+        </div>
+      </motion.div>
     </motion.div>
   )
 }

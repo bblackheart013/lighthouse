@@ -1,5 +1,5 @@
 # ClearSkies - Final Integrated Solution
-## NASA Space Apps Challenge 2024
+## NASA Space Apps Challenge 2025
 
 > *"The Earth is watching. Now you can too."*
 
@@ -395,7 +395,7 @@ Built with precision. Designed for impact. Crafted with love.
 
 ---
 
-*ClearSkies v2.0.0 - NASA Space Apps Challenge 2024*
+*ClearSkies v2.0.0 - NASA Space Apps Challenge 2025*
 
 **Created by:** [Your Team Name]
 **Date:** October 2025

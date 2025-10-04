@@ -56,7 +56,7 @@ System health check.
 {
   "status": "operational",
   "version": "1.0.0",
-  "timestamp": "2024-09-01T12:00:00Z"
+  "timestamp": "2025-09-01T12:00:00Z"
 }
 ```
 
@@ -79,7 +79,7 @@ curl "http://localhost:5001/tempo?lat=40.7&lon=-74.0"
   "request": {
     "latitude": 40.7,
     "longitude": -74.0,
-    "timestamp": "2024-09-01T12:00:00Z"
+    "timestamp": "2025-09-01T12:00:00Z"
   },
   "response": {
     "available": true,
@@ -118,7 +118,7 @@ curl "http://localhost:5001/forecast?lat=34.05&lon=-118.24"
     "location": {
       "latitude": 34.05,
       "longitude": -118.24,
-      "timestamp": "2024-09-01T12:00:00Z"
+      "timestamp": "2025-09-01T12:00:00Z"
     },
     "satellite": { ... },
     "ground_stations": { ... },

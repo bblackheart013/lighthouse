@@ -19,15 +19,16 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { AlertTriangle, Info, AlertCircle, Bell, ChevronDown, ChevronUp, Shield } from 'lucide-react'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { apiService } from '../services/api'
+import { useLocation } from '../context/LocationContext'
 
 const Alerts = () => {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [expandedAlert, setExpandedAlert] = useState(null)
+  const { location } = useLocation()
 
-  const lat = import.meta.env.VITE_DEFAULT_LAT || '34.05'
-  const lon = import.meta.env.VITE_DEFAULT_LON || '-118.24'
+  const { lat, lon } = location
 
   useEffect(() => {
     const fetchAlerts = async () => {
@@ -91,6 +92,20 @@ const Alerts = () => {
     }
   }
 
+  // Transform API response to array format
+  const alerts = data.alert_active && data.alert ? [
+    {
+      id: 1,
+      severity: data.alert.severity,
+      title: data.alert.headline,
+      message: data.alert.message,
+      actions: data.alert.actions || [],
+      affected_groups: ['General Public', 'Sensitive Groups'],
+      start_time: new Date().toISOString(),
+      end_time: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    }
+  ] : []
+
   const toggleAlert = (id) => {
     setExpandedAlert(expandedAlert === id ? null : id)
   }
@@ -111,7 +126,7 @@ const Alerts = () => {
           </h1>
         </div>
         <p className="text-slate-600 text-lg">
-          {data.location} • Active Alerts: {data.alerts.length}
+          {data.location?.city || `${data.location?.lat}, ${data.location?.lon}`} • Active Alerts: {alerts.length}
         </p>
       </div>
 
@@ -124,11 +139,11 @@ const Alerts = () => {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold mb-2">
-              {data.alerts.length > 0 ? 'Stay Informed' : 'All Clear'}
+              {alerts.length > 0 ? 'Stay Informed' : 'All Clear'}
             </h2>
             <p className="opacity-90">
-              {data.alerts.length > 0
-                ? `${data.alerts.length} alert${data.alerts.length > 1 ? 's' : ''} for your area`
+              {alerts.length > 0
+                ? `${alerts.length} alert${alerts.length > 1 ? 's' : ''} for your area`
                 : 'No active alerts at this time'}
             </p>
           </div>
@@ -137,9 +152,9 @@ const Alerts = () => {
       </motion.div>
 
       {/* Alerts List */}
-      {data.alerts.length > 0 ? (
+      {alerts.length > 0 ? (
         <div className="space-y-4">
-          {data.alerts.map((alert, index) => {
+          {alerts.map((alert, index) => {
             const config = severityConfig[alert.severity.toLowerCase()] || severityConfig.low
             const Icon = config.icon
             const isExpanded = expandedAlert === alert.id

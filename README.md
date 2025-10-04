@@ -2,11 +2,11 @@
 
 > **"The Earth is watching. Now you can too."**
 
-[![NASA Space Apps 2024](https://img.shields.io/badge/NASA-Space%20Apps%202024-blue.svg)](https://www.spaceappschallenge.org/)
+[![NASA Space Apps 2025](https://img.shields.io/badge/NASA-Space%20Apps%202025-blue.svg)](https://www.spaceappschallenge.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.1.2-green.svg)](https://flask.palletsprojects.com/)
 [![React](https://img.shields.io/badge/React-18.3.1-blue.svg)](https://reactjs.org/)
 
-Real-time air quality intelligence platform that transforms NASA TEMPO satellite data into actionable insights. Built for the **NASA Space Apps Challenge 2024**.
+Real-time air quality intelligence platform that transforms NASA TEMPO satellite data into actionable insights. Built for the **NASA Space Apps Challenge 2025**.
 
 ---
 
@@ -370,7 +370,7 @@ vercel --prod
 
 **Built with precision. Designed for impact. Crafted with love.**
 
-**NASA Space Apps Challenge 2024** | Version 3.0.0 | October 2024
+**NASA Space Apps Challenge 2025** | Version 3.0.0 | October 2025
 
 ---
 

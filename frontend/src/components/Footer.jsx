@@ -46,7 +46,7 @@ const Footer = () => {
           <p className="text-sm text-slate-600">
             Built for{' '}
             <span className="font-semibold text-blue-600">
-              NASA Space Apps Challenge 2024
+              NASA Space Apps Challenge 2025
             </span>
           </p>
           <p className="text-xs text-slate-500">

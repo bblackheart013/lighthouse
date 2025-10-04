@@ -173,6 +173,34 @@ export const apiService = {
   },
 
   /**
+   * Get active wildfires from NASA FIRMS
+   * Detects nearby wildfires using satellite thermal anomaly detection
+   *
+   * @param {number} lat - Latitude
+   * @param {number} lon - Longitude
+   * @param {number} radius - Search radius in km (default: 100)
+   * @returns {Promise} Wildfire data with locations, severity, and distance
+   */
+  getWildfires: async (lat, lon, radius = 100) => {
+    try {
+      const response = await api.get('/wildfires', {
+        params: { lat, lon, radius }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching wildfires:', error);
+      // Return safe default instead of throwing
+      return {
+        wildfire_detected: false,
+        count: 0,
+        fires: [],
+        closest_fire: null,
+        error: true
+      };
+    }
+  },
+
+  /**
    * Health check endpoint
    * Verifies backend API is operational
    *

@@ -13,9 +13,12 @@
 import React, { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
+import LocationSelector from './LocationSelector'
+import { useLocation } from '../context/LocationContext'
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
+  const { location, setLocation } = useLocation()
 
   // Navigation links configuration
   const navItems = [
@@ -50,12 +53,16 @@ const Navbar = () => {
           </NavLink>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-2">
+          <div className="hidden md:flex items-center space-x-2">
             {navItems.map((item) => (
               <NavLink key={item.path} to={item.path} className={linkClass}>
                 {item.label}
               </NavLink>
             ))}
+            <LocationSelector
+              onLocationChange={setLocation}
+              currentLocation={location}
+            />
           </div>
 
           {/* Mobile menu button */}
@@ -81,6 +88,12 @@ const Navbar = () => {
                 {item.label}
               </NavLink>
             ))}
+            <div className="pt-2">
+              <LocationSelector
+                onLocationChange={setLocation}
+                currentLocation={location}
+              />
+            </div>
           </div>
         )}
       </div>

@@ -460,7 +460,7 @@ MIT License - See LICENSE file for details
 
 ---
 
-**Created for:** NASA Space Apps Challenge 2024
+**Created for:** NASA Space Apps Challenge 2025
 **Team:** ClearSkies
 **Version:** 3.0.0
 **Contact:** [Your Contact Information]

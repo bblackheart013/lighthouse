@@ -59,7 +59,7 @@ curl "http://127.0.0.1:5001/alerts?lat=40.7&lon=-74.0&threshold=100" | python3 -
 ```bash
 git init
 git add .
-git commit -m "🌍 ClearSkies v3 - NASA Space Apps 2024"
+git commit -m "🌍 ClearSkies v3 - NASA Space Apps 2025"
 git branch -M main
 git remote add origin https://github.com/anubhavpgit/SpaceAppFlask.git
 git push -u origin main
@@ -185,5 +185,5 @@ python app.py
 
 ---
 
-**Built for NASA Space Apps Challenge 2024**
+**Built for NASA Space Apps Challenge 2025**
 *The Earth is Watching. Now you can too.* 🌍

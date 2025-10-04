@@ -274,6 +274,7 @@ def register_routes(app: Flask) -> None:
                 '/compare': 'Satellite vs ground sensor comparison',
                 '/ground': 'Ground sensor data from OpenAQ',
                 '/weather': 'NOAA weather conditions',
+                '/wildfires': 'Active wildfire detection from NASA FIRMS',
                 '/cache/stats': 'Cache performance metrics',
                 '/cache/clear': 'Clear all caches (POST)'
             },
@@ -281,7 +282,8 @@ def register_routes(app: Flask) -> None:
                 'forecast': '/forecast?lat=34.05&lon=-118.24&city=Los Angeles',
                 'alerts': '/alerts?lat=40.7&lon=-74.0&threshold=100',
                 'history': '/history?lat=40.7&lon=-74.0&days=7',
-                'compare': '/compare?lat=40.7&lon=-74.0'
+                'compare': '/compare?lat=40.7&lon=-74.0',
+                'wildfires': '/wildfires?lat=34.05&lon=-118.24&radius=100'
             },
             'data_sources': {
                 'satellite': '🛰️  NASA TEMPO - 22,000 miles above',
@@ -699,6 +701,49 @@ def register_routes(app: Flask) -> None:
             logger.warning("Incomplete data for comparison")
 
         return jsonify(result)
+
+    @app.route('/wildfires', methods=['GET'])
+    @validate_coordinates
+    def wildfires(lat: float, lon: float):
+        """
+        🔥 Active Wildfire Detection
+
+        Detects active wildfires using NASA FIRMS satellite data.
+        Returns nearby fires with distance, severity, and characteristics.
+
+        Query Parameters:
+            lat (float): Latitude
+            lon (float): Longitude
+            radius (int): Search radius in km (default: 100)
+
+        Returns:
+            Active wildfire data with severity classification
+        """
+        from firms_service import FirmsService
+
+        radius = request.args.get('radius', 100, type=int)
+
+        logger.data(f"Wildfire check: ({lat:.4f}, {lon:.4f}) [{radius}km]")
+
+        result = FirmsService.get_active_fires(lat, lon, radius)
+
+        if result['count'] > 0:
+            closest = result['closest_fire']
+            logger.warning(f"⚠️ {result['count']} active fire(s) detected - closest: {closest['distance_km']}km ({closest['severity']} severity)")
+        else:
+            logger.success(f"✓ No active wildfires within {radius}km")
+
+        return jsonify({
+            'location': {'lat': round(lat, 4), 'lon': round(lon, 4)},
+            'wildfire_detected': result['count'] > 0,
+            'count': result['count'],
+            'search_radius_km': radius,
+            'fires': result['fires'],
+            'closest_fire': result['closest_fire'],
+            'timestamp': result['timestamp'],
+            'source': 'NASA FIRMS (VIIRS/MODIS Satellites)',
+            'note': result.get('note')
+        })
 
     @app.route('/cache/stats', methods=['GET'])
     def cache_stats():

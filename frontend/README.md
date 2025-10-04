@@ -184,7 +184,7 @@ All endpoints are documented in `../TEST_AND_DEPLOY.md`
 - Cause analysis (pollution sources + weather)
 
 ### **About**
-- NASA Space Apps Challenge 2024 context
+- NASA Space Apps Challenge 2025 context
 - Mission statement
 - Data source attribution (TEMPO, OpenAQ, NOAA)
 - Team information
@@ -332,7 +332,7 @@ npm run build
 - **OpenAQ** - Ground sensor network
 - **NOAA** - Weather data
 
-**Built for NASA Space Apps Challenge 2024**
+**Built for NASA Space Apps Challenge 2025**
 
 ---
 

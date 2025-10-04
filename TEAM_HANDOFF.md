@@ -1,6 +1,6 @@
 # 🌍 ClearSkies v3 - Team Handoff
 
-> **Everything you need to launch this NASA Space Apps Challenge 2024 project**
+> **Everything you need to launch this NASA Space Apps Challenge 2025 project**
 
 ---
 
@@ -400,7 +400,7 @@ Now it's time to build the interface that does this technology justice.
 
 ---
 
-**Built for NASA Space Apps Challenge 2024**
+**Built for NASA Space Apps Challenge 2025**
 
 *"The Earth is watching. Now you can too."*
 

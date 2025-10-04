@@ -5,33 +5,44 @@
 
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Cloud, Wind, Droplets, AlertCircle } from 'lucide-react'
+import { Cloud, Wind, Droplets, AlertCircle, Activity } from 'lucide-react'
 import LoadingSpinner from '../components/LoadingSpinner'
+import WildfireAlert from '../components/WildfireAlert'
 import { apiService } from '../services/api'
 import { getAQIColor, getAQIGradient, getAQILabel, getHealthRecommendation } from '../utils/aqi'
+import { useLocation } from '../context/LocationContext'
 
 const Dashboard = () => {
   const [data, setData] = useState(null)
+  const [wildfireData, setWildfireData] = useState(null)
+  const [groundData, setGroundData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const { location } = useLocation()
 
-  // Default location: Los Angeles
-  const lat = import.meta.env.VITE_DEFAULT_LAT || 34.05
-  const lon = import.meta.env.VITE_DEFAULT_LON || -118.24
-  const city = import.meta.env.VITE_DEFAULT_CITY || 'Los Angeles'
+  const { lat, lon, city } = location
 
   useEffect(() => {
     fetchData()
     // Refresh every 60 seconds
     const interval = setInterval(fetchData, 60000)
     return () => clearInterval(interval)
-  }, [])
+  }, [lat, lon])
 
   const fetchData = async () => {
     try {
       setLoading(true)
-      const forecast = await apiService.getForecast(lat, lon, city)
+
+      // Fetch all data in parallel
+      const [forecast, wildfires, ground] = await Promise.all([
+        apiService.getForecast(lat, lon, city),
+        apiService.getWildfires(lat, lon, 100),
+        apiService.getGroundSensors(lat, lon)
+      ])
+
       setData(forecast)
+      setWildfireData(wildfires)
+      setGroundData(ground?.data || {})
       setError(null)
     } catch (err) {
       console.error('Error fetching data:', err)
@@ -65,7 +76,7 @@ const Dashboard = () => {
 
   if (!data || !data.prediction) return null
 
-  const { prediction, location, health_guidance, data_sources } = data
+  const { prediction, location: apiLocation, health_guidance, data_sources } = data
   const aqi = prediction.aqi
   const gradient = getAQIGradient(aqi)
   const category = prediction.category || getAQILabel(aqi)
@@ -82,7 +93,7 @@ const Dashboard = () => {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
           <h1 className="text-white text-2xl md:text-3xl font-light mb-4">
-            {location.city || `${location.lat}, ${location.lon}`}
+            {apiLocation.city || `${apiLocation.lat}, ${apiLocation.lon}`}
           </h1>
 
           {/* Giant AQI Number */}
@@ -106,6 +117,9 @@ const Dashboard = () => {
 
       {/* Details Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Wildfire Alert */}
+        {wildfireData && <WildfireAlert wildfireData={wildfireData} />}
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Weather Info */}
           {data_sources.weather?.available && (
@@ -208,6 +222,71 @@ const Dashboard = () => {
                 <p className="text-white/70">{health_guidance.sensitive_groups}</p>
               </div>
             </div>
+          </motion.div>
+        )}
+
+        {/* Environmental Metrics */}
+        {groundData && Object.keys(groundData).length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="mt-8 bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <Activity className="w-6 h-6 text-blue-400" />
+              <h3 className="text-2xl font-bold text-white">Environmental Metrics</h3>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              {['PM2.5', 'PM10', 'NO2', 'CO', 'SO2', 'O3'].map((pollutant) => {
+                const pollutantData = groundData[pollutant]
+
+                const getQualityColor = (quality) => {
+                  if (!quality) return 'text-gray-400'
+                  if (quality === 'good') return 'text-green-400'
+                  if (quality === 'moderate') return 'text-yellow-400'
+                  if (quality.includes('unhealthy')) return 'text-orange-400'
+                  if (quality === 'very_unhealthy') return 'text-red-400'
+                  if (quality === 'hazardous') return 'text-purple-400'
+                  return 'text-gray-400'
+                }
+
+                const getQualityBg = (quality) => {
+                  if (!quality) return 'bg-gray-500/10'
+                  if (quality === 'good') return 'bg-green-500/10'
+                  if (quality === 'moderate') return 'bg-yellow-500/10'
+                  if (quality.includes('unhealthy')) return 'bg-orange-500/10'
+                  if (quality === 'very_unhealthy') return 'bg-red-500/10'
+                  if (quality === 'hazardous') return 'bg-purple-500/10'
+                  return 'bg-gray-500/10'
+                }
+
+                return (
+                  <div
+                    key={pollutant}
+                    className={`${getQualityBg(pollutantData?.quality)} rounded-lg p-4 border border-white/10`}
+                  >
+                    <div className="text-white/60 text-sm mb-1">{pollutant}</div>
+                    {pollutantData ? (
+                      <>
+                        <div className={`text-2xl font-bold ${getQualityColor(pollutantData.quality)} mb-1`}>
+                          {pollutantData.value}
+                        </div>
+                        <div className="text-white/40 text-xs">{pollutantData.unit}</div>
+                        <div className={`text-xs mt-2 capitalize ${getQualityColor(pollutantData.quality)}`}>
+                          {pollutantData.quality?.replace('_', ' ')}
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-gray-500 text-sm">N/A</div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+            <p className="text-white/30 text-xs mt-4">
+              Data from OpenAQ Ground Sensors • Color-coded by EPA Air Quality Standards
+            </p>
           </motion.div>
         )}
 

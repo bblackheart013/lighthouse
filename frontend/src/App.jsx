@@ -11,6 +11,7 @@
 
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
+import { LocationProvider } from './context/LocationContext'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Dashboard from './pages/Dashboard'
@@ -22,23 +23,25 @@ import About from './pages/About'
 
 function App() {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-50">
-      <Navbar />
+    <LocationProvider>
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-50">
+        <Navbar />
 
-      {/* Main content area - grows to fill available space */}
-      <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/forecast" element={<Forecast />} />
-          <Route path="/history" element={<History />} />
-          <Route path="/compare" element={<Compare />} />
-          <Route path="/alerts" element={<Alerts />} />
-          <Route path="/about" element={<About />} />
-        </Routes>
-      </main>
+        {/* Main content area - grows to fill available space */}
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/forecast" element={<Forecast />} />
+            <Route path="/history" element={<History />} />
+            <Route path="/compare" element={<Compare />} />
+            <Route path="/alerts" element={<Alerts />} />
+            <Route path="/about" element={<About />} />
+          </Routes>
+        </main>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </LocationProvider>
   )
 }
 

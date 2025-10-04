@@ -189,7 +189,7 @@ git init
 git add .
 
 # Create first commit
-git commit -m "🌍 ClearSkies v3 - NASA Space Apps 2024
+git commit -m "🌍 ClearSkies v3 - NASA Space Apps 2025
 
 - Complete Flask backend with ML forecasting
 - Multi-source data integration (TEMPO + OpenAQ + NOAA)
@@ -198,7 +198,7 @@ git commit -m "🌍 ClearSkies v3 - NASA Space Apps 2024
 - Apple-style design system
 - Comprehensive documentation
 
-Built for NASA Space Apps Challenge 2024
+Built for NASA Space Apps Challenge 2025
 The Earth is Watching. Now you can too."
 
 # Add remote repository
@@ -597,5 +597,5 @@ CORS(app, resources={
 
 ---
 
-**Built for NASA Space Apps Challenge 2024**
+**Built for NASA Space Apps Challenge 2025**
 *The Earth is Watching. Now you can too.* 🌍✨

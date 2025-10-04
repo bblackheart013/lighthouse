@@ -189,13 +189,21 @@ class OpenAQService:
         """
         Gather ground-based measurements from nearby sensors.
         The human perspective - air quality at street level.
+
+        Returns comprehensive pollutant data including:
+        - PM2.5 (Particulate Matter < 2.5 microns)
+        - PM10 (Particulate Matter < 10 microns)
+        - NO2 (Nitrogen Dioxide)
+        - CO (Carbon Monoxide)
+        - SO2 (Sulfur Dioxide)
+        - O3 (Ozone)
         """
         try:
             url = f"{config.OPENAQ_API}/latest"
             params = {
                 'coordinates': f"{lat},{lon}",
                 'radius': radius_km * 1000,
-                'limit': 3
+                'limit': 10  # Increased to get more pollutant types
             }
 
             response = requests.get(url, params=params, timeout=10)
@@ -210,7 +218,10 @@ class OpenAQService:
                 return None
 
             # Aggregate measurements from all nearby stations
+            # Prioritize these pollutants for environmental metrics
+            priority_pollutants = ['pm25', 'pm10', 'no2', 'co', 'so2', 'o3']
             aggregated = {}
+
             for station in results:
                 for measurement in station.get('measurements', []):
                     param = measurement.get('parameter')
@@ -218,23 +229,72 @@ class OpenAQService:
                     unit = measurement.get('unit')
 
                     if param and value:
-                        if param not in aggregated:
-                            aggregated[param] = {'values': [], 'unit': unit}
-                        aggregated[param]['values'].append(value)
+                        # Normalize parameter name
+                        param_normalized = param.lower().replace('.', '').replace('_', '')
 
-            # Calculate averages
+                        if param_normalized not in aggregated:
+                            aggregated[param_normalized] = {'values': [], 'unit': unit}
+                        aggregated[param_normalized]['values'].append(value)
+
+            # Calculate averages and format output
             averaged = {}
             for param, data in aggregated.items():
-                averaged[param] = {
+                # Convert back to standard names
+                standard_name = param.upper()
+                if param == 'pm25':
+                    standard_name = 'PM2.5'
+                elif param == 'pm10':
+                    standard_name = 'PM10'
+
+                averaged[standard_name] = {
                     'value': round(np.mean(data['values']), 2),
                     'unit': data['unit'],
-                    'source': 'OpenAQ Ground Stations'
+                    'source': 'OpenAQ Ground Stations',
+                    'quality': OpenAQService._assess_pollutant_quality(standard_name, round(np.mean(data['values']), 2))
                 }
 
             return averaged if averaged else None
 
         except Exception:
             return None
+
+    @staticmethod
+    def _assess_pollutant_quality(pollutant: str, value: float) -> str:
+        """
+        Assess air quality based on pollutant concentration.
+
+        Args:
+            pollutant: Pollutant name (PM2.5, PM10, NO2, CO, SO2, O3)
+            value: Concentration value
+
+        Returns:
+            Quality assessment: 'good', 'moderate', 'unhealthy', 'very_unhealthy', 'hazardous'
+        """
+        # EPA Air Quality Index breakpoints (simplified)
+        breakpoints = {
+            'PM2.5': [(0, 12, 'good'), (12.1, 35.4, 'moderate'), (35.5, 55.4, 'unhealthy_sensitive'),
+                      (55.5, 150.4, 'unhealthy'), (150.5, 250.4, 'very_unhealthy'), (250.5, 500, 'hazardous')],
+            'PM10': [(0, 54, 'good'), (55, 154, 'moderate'), (155, 254, 'unhealthy_sensitive'),
+                     (255, 354, 'unhealthy'), (355, 424, 'very_unhealthy'), (425, 604, 'hazardous')],
+            'NO2': [(0, 53, 'good'), (54, 100, 'moderate'), (101, 360, 'unhealthy_sensitive'),
+                    (361, 649, 'unhealthy'), (650, 1249, 'very_unhealthy'), (1250, 2049, 'hazardous')],
+            'O3': [(0, 54, 'good'), (55, 70, 'moderate'), (71, 85, 'unhealthy_sensitive'),
+                   (86, 105, 'unhealthy'), (106, 200, 'very_unhealthy')],
+            'CO': [(0, 4.4, 'good'), (4.5, 9.4, 'moderate'), (9.5, 12.4, 'unhealthy_sensitive'),
+                   (12.5, 15.4, 'unhealthy'), (15.5, 30.4, 'very_unhealthy'), (30.5, 50.4, 'hazardous')],
+            'SO2': [(0, 35, 'good'), (36, 75, 'moderate'), (76, 185, 'unhealthy_sensitive'),
+                    (186, 304, 'unhealthy'), (305, 604, 'very_unhealthy'), (605, 1004, 'hazardous')]
+        }
+
+        if pollutant not in breakpoints:
+            return 'unknown'
+
+        for min_val, max_val, quality in breakpoints[pollutant]:
+            if min_val <= value <= max_val:
+                return quality
+
+        # If exceeds all breakpoints
+        return 'hazardous'
 
 
 class NOAAWeatherService:
