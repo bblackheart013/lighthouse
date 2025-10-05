@@ -30,6 +30,11 @@ Real-time air quality intelligence platform that transforms NASA TEMPO satellite
 
 ## 🚀 Quick Start (5 Minutes)
 
+> **🔐 SECURITY NOTE:** No API keys are committed to this repository. All keys are stored in `.env` files which are gitignored. The WAQI API token (if present in code files) is a demo token with limited access. For production use, obtain your own free API keys from:
+> - **WAQI:** https://aqicn.org/data-platform/token/
+> - **Google Gemini:** https://ai.google.dev/
+> - **OpenWeather:** https://openweathermap.org/api
+
 ### **1. Start Backend API**
 
 ```bash
