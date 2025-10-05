@@ -11,7 +11,7 @@
 
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Satellite, Database, Cloud, Target, Users, Zap, Globe, Heart, Award } from 'lucide-react'
+import { Satellite, Database, Cloud, Target, Users, Zap, Globe, Heart, Award, Flame, Sparkles, Server } from 'lucide-react'
 
 const About = () => {
   const features = [
@@ -20,6 +20,18 @@ const About = () => {
       title: 'NASA TEMPO Satellite',
       description: 'Hourly air quality measurements from space, providing unprecedented temporal resolution for North America.',
       color: 'blue'
+    },
+    {
+      icon: Flame,
+      title: 'NASA FIRMS Wildfire Data',
+      description: 'Real-time wildfire detection with exact GPS coordinates, helping you stay safe during fire season.',
+      color: 'orange'
+    },
+    {
+      icon: Sparkles,
+      title: 'Google Gemini AI',
+      description: 'AI-powered health insights that analyze air quality and provide personalized recommendations for your safety.',
+      color: 'purple'
     },
     {
       icon: Database,
@@ -31,7 +43,7 @@ const About = () => {
       icon: Cloud,
       title: 'NOAA Weather Integration',
       description: 'Meteorological data to understand how weather patterns influence air quality and pollution dispersion.',
-      color: 'purple'
+      color: 'cyan'
     },
     {
       icon: Zap,
@@ -185,7 +197,9 @@ const About = () => {
               blue: 'from-blue-500 to-blue-600',
               green: 'from-green-500 to-green-600',
               purple: 'from-purple-500 to-purple-600',
-              yellow: 'from-yellow-500 to-yellow-600'
+              yellow: 'from-yellow-500 to-yellow-600',
+              orange: 'from-orange-500 to-orange-600',
+              cyan: 'from-cyan-500 to-cyan-600'
             }
 
             return (
@@ -279,11 +293,124 @@ const About = () => {
         </div>
       </motion.div>
 
-      {/* Call to Action */}
+      {/* Powered By & Partners Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.9 }}
+        className="mt-16 mb-16"
+      >
+        <h2 className="text-3xl font-bold text-slate-800 text-center mb-8">
+          Powered By & Partners
+        </h2>
+        <p className="text-center text-slate-600 mb-12 max-w-3xl mx-auto">
+          Lighthouse is built on cutting-edge technology from world-class organizations committed to making Earth observation data accessible and actionable.
+        </p>
+
+        {/* Partner Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {/* NASA */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 2.0 }}
+            className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-8 shadow-lg hover:shadow-xl transition-all border border-blue-200"
+          >
+            <div className="flex items-center justify-center mb-4">
+              <Satellite className="text-blue-600" size={48} />
+            </div>
+            <h3 className="text-xl font-bold text-center text-slate-800 mb-2">NASA</h3>
+            <p className="text-center text-slate-600 text-sm">
+              TEMPO Satellite & FIRMS Wildfire Data
+            </p>
+          </motion.div>
+
+          {/* Google Gemini */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 2.1 }}
+            className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-8 shadow-lg hover:shadow-xl transition-all border border-purple-200"
+          >
+            <div className="flex items-center justify-center mb-4">
+              <Sparkles className="text-purple-600" size={48} />
+            </div>
+            <h3 className="text-xl font-bold text-center text-slate-800 mb-2">Google Gemini</h3>
+            <p className="text-center text-slate-600 text-sm">
+              AI-Powered Health Insights & Recommendations
+            </p>
+          </motion.div>
+
+          {/* Cloudflare */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 2.2 }}
+            className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-8 shadow-lg hover:shadow-xl transition-all border border-orange-200"
+          >
+            <div className="flex items-center justify-center mb-4">
+              <Server className="text-orange-600" size={48} />
+            </div>
+            <h3 className="text-xl font-bold text-center text-slate-800 mb-2">Cloudflare</h3>
+            <p className="text-center text-slate-600 text-sm">
+              Global Edge Network & Platform Infrastructure
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Additional Data Sources */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 2.3 }}
+            className="bg-white rounded-lg p-4 shadow-md text-center border border-slate-200"
+          >
+            <Cloud className="mx-auto mb-2 text-slate-600" size={32} />
+            <p className="text-sm font-semibold text-slate-800">NOAA</p>
+            <p className="text-xs text-slate-600">Weather Data</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 2.4 }}
+            className="bg-white rounded-lg p-4 shadow-md text-center border border-slate-200"
+          >
+            <Database className="mx-auto mb-2 text-slate-600" size={32} />
+            <p className="text-sm font-semibold text-slate-800">OpenAQ</p>
+            <p className="text-xs text-slate-600">Ground Sensors</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 2.5 }}
+            className="bg-white rounded-lg p-4 shadow-md text-center border border-slate-200"
+          >
+            <Zap className="mx-auto mb-2 text-slate-600" size={32} />
+            <p className="text-sm font-semibold text-slate-800">Scikit-learn</p>
+            <p className="text-xs text-slate-600">ML Forecasts</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 2.6 }}
+            className="bg-white rounded-lg p-4 shadow-md text-center border border-slate-200"
+          >
+            <Award className="mx-auto mb-2 text-slate-600" size={32} />
+            <p className="text-sm font-semibold text-slate-800">NASA Space Apps</p>
+            <p className="text-xs text-slate-600">2025 Challenge</p>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Call to Action */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 2.7 }}
         className="mt-16 text-center"
       >
         <p className="text-slate-600 text-lg mb-4">
