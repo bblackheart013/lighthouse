@@ -11,6 +11,7 @@ This module orchestrates intelligence from three worlds:
 
 ═══════════════════════════════════════════════════════════════════════════
 """
+import os
 import requests
 import numpy as np
 from typing import Optional, Dict, Any
