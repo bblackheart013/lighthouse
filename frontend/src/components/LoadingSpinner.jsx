@@ -1,5 +1,5 @@
 /**
- * ClearSkies v3 - Loading Spinner Component
+ * Lighthouse v3 - Loading Spinner Component
  *
  * Waiting doesn't have to be boring. This spinner provides visual
  * feedback during data fetches, maintaining user engagement and

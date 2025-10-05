@@ -1,4 +1,4 @@
-# 🌤️ ClearSkies v3 - Air Quality Intelligence Platform
+# 🌤️ Lighthouse v3 - Air Quality Intelligence Platform
 
 > **"The Earth is watching. Now you can too."**
 
@@ -125,7 +125,7 @@ Expected: **🎉 All 8 tests passed!**
 ## 📂 Project Structure
 
 ```
-ClearSkies/
+Lighthouse/
 ├── flask_api/              # Backend API ✅
 │   ├── app.py             # Flask application (8 endpoints)
 │   ├── predictor.py       # ML forecasting engine
@@ -332,7 +332,7 @@ This project is licensed under the MIT License.
 
 ## 📧 Contact
 
-**Team ClearSkies**
+**Team Lighthouse**
 - **GitHub:** [@anubhavpgit](https://github.com/anubhavpgit)
 - **Repository:** [SpaceAppFlask](https://github.com/anubhavpgit/SpaceAppFlask)
 

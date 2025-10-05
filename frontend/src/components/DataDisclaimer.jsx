@@ -97,7 +97,7 @@ const DataDisclaimer = () => {
                 100% Real Data - No Synthetic or Simulated Values
               </h4>
               <p className="text-xs text-blue-100 leading-relaxed">
-                All air quality data displayed in ClearSkies comes from <strong>authentic scientific sources</strong>:
+                All air quality data displayed in Lighthouse comes from <strong>authentic scientific sources</strong>:
                 NASA's TEMPO satellite mission (archived NetCDF data from official NASA repositories),
                 WAQI's global network of government-certified monitoring stations, and
                 Open-Meteo's aggregation of NOAA/ECMWF weather data.

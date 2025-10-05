@@ -1,5 +1,5 @@
 """
-ClearSkies API Configuration
+Lighthouse API Configuration
 Elegant, production-ready settings for air quality intelligence.
 """
 import os
@@ -10,7 +10,7 @@ class Config:
     """Base configuration - crafted for clarity and extensibility."""
 
     # API Metadata
-    API_TITLE = "ClearSkies API"
+    API_TITLE = "Lighthouse API"
     API_VERSION = "1.0.0"
     API_DESCRIPTION = "NASA TEMPO satellite data meets ground truth"
 

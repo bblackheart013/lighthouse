@@ -1,5 +1,5 @@
 /**
- * ClearSkies API Service
+ * Lighthouse API Service
  *
  * Connects the frontend to the Flask backend API running on port 5001.
  * This service handles all HTTP requests to fetch air quality data from:

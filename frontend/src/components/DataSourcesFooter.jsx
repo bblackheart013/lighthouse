@@ -1,7 +1,7 @@
 /**
- * ClearSkies v3 - Data Sources Footer Component
+ * Lighthouse v3 - Data Sources Footer Component
  *
- * Transparency is at the heart of ClearSkies. This footer showcases
+ * Transparency is at the heart of Lighthouse. This footer showcases
  * all the incredible data sources that power our platform, with
  * clickable links for verification and real-time status indicators.
  *
@@ -139,7 +139,7 @@ const DataSourcesFooter = () => {
             Data Sources
           </h2>
           <p className="text-slate-400 max-w-2xl mx-auto">
-            ClearSkies is powered by world-class data providers. Every piece of
+            Lighthouse is powered by world-class data providers. Every piece of
             information is verifiable, traceable, and transparent.
           </p>
         </div>

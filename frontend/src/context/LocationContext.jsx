@@ -2,7 +2,7 @@
  * LocationContext - Global Location State Management
  *
  * This context provides location state (lat, lon, city) to all components
- * in the ClearSkies application. It allows users to change their location
+ * in the Lighthouse application. It allows users to change their location
  * globally and have all pages react to the change.
  *
  * Default location: Los Angeles (34.05, -118.24)

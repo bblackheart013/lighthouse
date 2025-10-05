@@ -1,11 +1,11 @@
 /**
- * ClearSkies v3 - About Page
+ * Lighthouse v3 - About Page
  *
- * The mission briefing. This page tells the story of ClearSkies:
+ * The mission briefing. This page tells the story of Lighthouse:
  * our purpose, our approach, and our commitment to communities
  * affected by air pollution.
  *
- * Built for NASA Space Apps Challenge 2025, ClearSkies represents
+ * Built for NASA Space Apps Challenge 2025, Lighthouse represents
  * the future of accessible, actionable environmental data.
  */
 
@@ -50,7 +50,7 @@ const About = () => {
     {
       icon: Users,
       title: 'Who We Serve',
-      description: 'From parents planning outdoor activities to policymakers crafting environmental regulations, ClearSkies serves everyone.'
+      description: 'From parents planning outdoor activities to policymakers crafting environmental regulations, Lighthouse serves everyone.'
     },
     {
       icon: Heart,
@@ -85,7 +85,7 @@ const About = () => {
           transition={{ delay: 0.3 }}
           className="text-5xl sm:text-6xl font-bold text-slate-800 mb-6"
         >
-          About ClearSkies
+          About Lighthouse
         </motion.h1>
 
         <motion.p
@@ -98,7 +98,7 @@ const About = () => {
         </motion.p>
       </div>
 
-      {/* What Makes ClearSkies Different */}
+      {/* What Makes Lighthouse Different */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -106,7 +106,7 @@ const About = () => {
         className="mb-16"
       >
         <h2 className="text-3xl font-bold text-slate-800 text-center mb-12">
-          What Makes ClearSkies Different
+          What Makes Lighthouse Different
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-6 border border-blue-100">
@@ -222,10 +222,10 @@ const About = () => {
         transition={{ delay: 1.5 }}
         className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-2xl p-12 text-white mb-16"
       >
-        <h2 className="text-3xl font-bold mb-6">The Story Behind ClearSkies</h2>
+        <h2 className="text-3xl font-bold mb-6">The Story Behind Lighthouse</h2>
         <div className="space-y-4 text-lg leading-relaxed opacity-90">
           <p>
-            ClearSkies was born from a simple question: <strong>What if everyone could see
+            Lighthouse was born from a simple question: <strong>What if everyone could see
             the air they breathe?</strong>
           </p>
           <p>
@@ -240,7 +240,7 @@ const About = () => {
             <strong> predictive air quality intelligence for everyone</strong>.
           </p>
           <p>
-            Built for the NASA Space Apps Challenge 2025, ClearSkies represents our vision
+            Built for the NASA Space Apps Challenge 2025, Lighthouse represents our vision
             of a future where environmental data isn't locked in academic papers or government
             databases — it's in your pocket, helping you protect yourself and your loved ones.
           </p>
@@ -259,7 +259,7 @@ const About = () => {
           NASA Space Apps Challenge 2025
         </h3>
         <p className="text-slate-600 mb-4">
-          ClearSkies v3 is our submission to the world's largest global hackathon,
+          Lighthouse v3 is our submission to the world's largest global hackathon,
           addressing the challenge of making NASA's Earth observation data accessible
           and actionable for communities worldwide.
         </p>

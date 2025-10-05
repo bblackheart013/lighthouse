@@ -1,5 +1,5 @@
 /**
- * ClearSkies v3 - History Page
+ * Lighthouse v3 - History Page
  *
  * Looking back to understand the present. This page visualizes
  * 7 days of historical AQI data, helping users identify patterns

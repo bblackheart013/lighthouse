@@ -1,7 +1,7 @@
 {
-  "name": "clearskies-frontend",
+  "name": "lighthouse-frontend",
   "version": "3.0.0",
-  "description": "ClearSkies v3 - Air Quality Intelligence Dashboard",
+  "description": "Lighthouse v3 - Air Quality Intelligence Dashboard",
   "type": "module",
   "scripts": {
     "dev": "vite --host",

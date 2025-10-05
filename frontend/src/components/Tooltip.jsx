@@ -1,5 +1,5 @@
 /**
- * ClearSkies v3 - Tooltip Component
+ * Lighthouse v3 - Tooltip Component
  *
  * Professional tooltips that provide helpful context for metrics
  * and technical terms without cluttering the interface.

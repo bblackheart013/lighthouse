@@ -1,5 +1,5 @@
 /**
- * ClearSkies v3 - Dashboard (PRODUCTION ENHANCED)
+ * Lighthouse v3 - Dashboard (PRODUCTION ENHANCED)
  * Real-time air quality awareness powered by NASA TEMPO
  *
  * New v3 Features:

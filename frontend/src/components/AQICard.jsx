@@ -1,5 +1,5 @@
 /**
- * ClearSkies v3 - AQI Card Component
+ * Lighthouse v3 - AQI Card Component
  *
  * This is our primary data visualization component - a card that
  * displays AQI information with appropriate color coding.

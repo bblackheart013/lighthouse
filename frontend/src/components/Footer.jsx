@@ -1,9 +1,9 @@
 /**
- * ClearSkies v3 - Footer Component
+ * Lighthouse v3 - Footer Component
  *
  * Every great mission needs proper attribution. This footer honors
  * the incredible work of NASA TEMPO, OpenAQ, and NOAA - the data
- * providers that make ClearSkies possible.
+ * providers that make Lighthouse possible.
  *
  * It's minimal, elegant, and informative - just like a good
  * mission patch.
@@ -50,7 +50,7 @@ const Footer = () => {
             </span>
           </p>
           <p className="text-xs text-slate-500">
-            &copy; {currentYear} ClearSkies v3. Empowering communities through data.
+            &copy; {currentYear} Lighthouse v3. Empowering communities through data.
           </p>
         </div>
       </div>

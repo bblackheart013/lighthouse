@@ -1,4 +1,4 @@
-# ClearSkies API
+# Lighthouse API
 
 > **Air quality intelligence from space to your fingertips.**
 
@@ -8,7 +8,7 @@ NASA TEMPO satellite observations meet ground truth and weather context in a sin
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                      ClearSkies API                         │
+│                      Lighthouse API                         │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  │

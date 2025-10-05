@@ -1,5 +1,5 @@
 /**
- * ClearSkies Value Proposition Component
+ * Lighthouse Value Proposition Component
  * Compelling hero section explaining WHY users need this app
  */
 
@@ -64,7 +64,7 @@ const ValueProposition = () => {
           </div>
 
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-6 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent leading-tight">
-            Why ClearSkies?
+            Why Lighthouse?
           </h1>
 
           <p className="text-2xl md:text-3xl font-light text-white/90 mb-4">

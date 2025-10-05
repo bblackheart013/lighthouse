@@ -1,4 +1,4 @@
-# ClearSkies API Architecture
+# Lighthouse API Architecture
 
 > *"Simplicity is the ultimate sophistication."* — Leonardo da Vinci
 
@@ -207,7 +207,7 @@ def get_pollutant_data(lat, lon):
 }
 ```
 
-### ClearSkies Approach (Good)
+### Lighthouse Approach (Good)
 ```json
 {
   "success": false,

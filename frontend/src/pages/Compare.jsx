@@ -1,5 +1,5 @@
 /**
- * ClearSkies v3 - NEW Compare Page
+ * Lighthouse v3 - NEW Compare Page
  *
  * Revolutionary temporal comparison showing satellite AQI trends:
  * - Current AQI from NASA TEMPO
@@ -407,7 +407,7 @@ const Compare = () => {
                 </div>
 
                 <p className="mt-4 text-sm">
-                  ClearSkies uses satellite data to ensure you always have access to air quality information, regardless of your location. This temporal view shows how air quality changes over time, helping you plan outdoor activities and understand pollution patterns.
+                  Lighthouse uses satellite data to ensure you always have access to air quality information, regardless of your location. This temporal view shows how air quality changes over time, helping you plan outdoor activities and understand pollution patterns.
                 </p>
               </div>
             </div>

@@ -1,5 +1,5 @@
 /**
- * ClearSkies v3 - Data Export Component
+ * Lighthouse v3 - Data Export Component
  *
  * Professional data export features:
  * - PDF report generation with branding
@@ -32,7 +32,7 @@ const DataExport = ({ data, location }) => {
       pdf.setTextColor(255, 255, 255)
       pdf.setFontSize(24)
       pdf.setFont(undefined, 'bold')
-      pdf.text('ClearSkies Air Quality Report', 15, 20)
+      pdf.text('Lighthouse Air Quality Report', 15, 20)
 
       pdf.setFontSize(12)
       pdf.setFont(undefined, 'normal')
@@ -99,10 +99,10 @@ const DataExport = ({ data, location }) => {
       pdf.setTextColor(128, 128, 128)
       pdf.setFontSize(9)
       pdf.text('Powered by NASA TEMPO, OpenAQ, and NOAA', 15, pageHeight - 15)
-      pdf.text('ClearSkies v3 - Real-time Earth Awareness', 15, pageHeight - 10)
+      pdf.text('Lighthouse v3 - Real-time Earth Awareness', 15, pageHeight - 10)
 
       // Save
-      pdf.save(`clearskies-report-${location?.city || 'location'}-${new Date().toISOString().split('T')[0]}.pdf`)
+      pdf.save(`lighthouse-report-${location?.city || 'location'}-${new Date().toISOString().split('T')[0]}.pdf`)
       setShowMenu(false)
     } catch (error) {
       console.error('PDF export failed:', error)
@@ -118,7 +118,7 @@ const DataExport = ({ data, location }) => {
         prediction: data?.prediction,
         health_guidance: data?.health_guidance,
         data_sources: data?.data_sources,
-        exported_by: 'ClearSkies v3',
+        exported_by: 'Lighthouse v3',
         version: '3.0.0'
       }
 
@@ -127,7 +127,7 @@ const DataExport = ({ data, location }) => {
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      link.download = `clearskies-data-${location?.city || 'location'}-${new Date().toISOString().split('T')[0]}.json`
+      link.download = `lighthouse-data-${location?.city || 'location'}-${new Date().toISOString().split('T')[0]}.json`
       link.click()
       URL.revokeObjectURL(url)
       setShowMenu(false)

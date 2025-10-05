@@ -1,5 +1,5 @@
 /**
- * ClearSkies v3 - Error Boundary Component
+ * Lighthouse v3 - Error Boundary Component
  *
  * Professional error handling that catches React component errors
  * and displays a beautiful, helpful error screen instead of a blank page.
@@ -124,8 +124,8 @@ class ErrorBoundary extends React.Component {
               <div className="mt-8 pt-6 border-t border-white/10 text-center">
                 <p className="text-white/50 text-sm">
                   Need help? Contact support at{' '}
-                  <a href="mailto:support@clearskies.app" className="text-blue-400 hover:text-blue-300 underline">
-                    support@clearskies.app
+                  <a href="mailto:support@lighthouse.app" className="text-blue-400 hover:text-blue-300 underline">
+                    support@lighthouse.app
                   </a>
                 </p>
               </div>
@@ -134,7 +134,7 @@ class ErrorBoundary extends React.Component {
             {/* Attribution */}
             <div className="mt-6 text-center">
               <p className="text-white/30 text-sm">
-                ClearSkies v3 - Powered by NASA TEMPO, OpenAQ, and NOAA
+                Lighthouse v3 - Powered by NASA TEMPO, OpenAQ, and NOAA
               </p>
             </div>
           </motion.div>

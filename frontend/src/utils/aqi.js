@@ -1,7 +1,7 @@
 /**
  * AQI (Air Quality Index) Utilities
  *
- * The visual DNA of ClearSkies - transforming numbers into colors,
+ * The visual DNA of Lighthouse - transforming numbers into colors,
  * categories into meaning, data into understanding.
  *
  * Based on EPA Air Quality Index standards.

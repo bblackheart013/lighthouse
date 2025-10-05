@@ -1,5 +1,5 @@
 /**
- * ClearSkies v3 - Main Application Component
+ * Lighthouse v3 - Main Application Component
  *
  * This is the architectural backbone of our application. Like a flight plan,
  * it defines all possible routes and ensures users can navigate between

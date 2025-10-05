@@ -1,5 +1,5 @@
 /**
- * ClearSkies v3 - Main Entry Point (PRODUCTION READY)
+ * Lighthouse v3 - Main Entry Point (PRODUCTION READY)
  *
  * This is where our React application bootstraps itself into the DOM.
  * We wrap everything in:

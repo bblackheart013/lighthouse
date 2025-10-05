@@ -1,5 +1,5 @@
 /**
- * ClearSkies v3 - Alerts Page
+ * Lighthouse v3 - Alerts Page
  *
  * The early warning system. This page displays health alerts and
  * recommendations based on air quality predictions.
@@ -267,7 +267,7 @@ const Alerts = () => {
           How Our Alert System Works
         </h3>
         <p className="text-slate-700 leading-relaxed mb-4">
-          ClearSkies monitors air quality forecasts continuously and generates alerts when
+          Lighthouse monitors air quality forecasts continuously and generates alerts when
           conditions are expected to deteriorate. Alerts are issued based on EPA guidelines
           and categorized by severity and affected population groups.
         </p>

@@ -1,8 +1,8 @@
-# Google Gemini AI Integration for ClearSkies API
+# Google Gemini AI Integration for Lighthouse API
 
 ## Overview
 
-This integration adds intelligent air quality insights powered by Google Gemini AI to the ClearSkies API. The AI analyzes air quality data and provides personalized health recommendations in simple, easy-to-understand language.
+This integration adds intelligent air quality insights powered by Google Gemini AI to the Lighthouse API. The AI analyzes air quality data and provides personalized health recommendations in simple, easy-to-understand language.
 
 ## Features
 
@@ -117,7 +117,7 @@ This will:
 
 ## Integration with Existing Endpoints
 
-The AI insights work seamlessly with existing ClearSkies data:
+The AI insights work seamlessly with existing Lighthouse data:
 
 - **AQI Data**: From TEMPO satellite predictions
 - **Pollutants**: From OpenAQ ground sensors
@@ -176,7 +176,7 @@ pip install google-generativeai
 
 ## License
 
-This integration is part of the ClearSkies API project.
+This integration is part of the Lighthouse API project.
 
 ---
 

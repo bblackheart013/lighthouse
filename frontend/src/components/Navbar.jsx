@@ -1,5 +1,5 @@
 /**
- * ClearSkies v3 - Navigation Bar Component
+ * Lighthouse - Navigation Bar Component
  *
  * The navigation bar is our mission control panel - always visible,
  * always accessible. It uses React Router's NavLink to provide
@@ -44,11 +44,11 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo and brand */}
           <NavLink to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-xl">CS</span>
+            <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-400 rounded-xl flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-xl">🏮</span>
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-              ClearSkies
+            <span className="text-xl font-bold bg-gradient-to-r from-amber-600 to-orange-500 bg-clip-text text-transparent">
+              Lighthouse
             </span>
           </NavLink>
 

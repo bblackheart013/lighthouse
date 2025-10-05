@@ -1,5 +1,5 @@
 /**
- * ClearSkies v3 - Forecast Page
+ * Lighthouse v3 - Forecast Page
  *
  * The crystal ball. This page shows users what's coming in the next
  * 24 hours, leveraging our ML model's predictive capabilities.

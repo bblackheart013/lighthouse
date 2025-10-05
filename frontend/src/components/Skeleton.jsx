@@ -1,5 +1,5 @@
 /**
- * ClearSkies v3 - Skeleton Loading Component
+ * Lighthouse v3 - Skeleton Loading Component
  *
  * Professional loading states that maintain layout and reduce perceived wait time.
  * Much better UX than spinning loaders - users see the structure before the data.

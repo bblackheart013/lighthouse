@@ -1,4 +1,4 @@
-# ClearSkies - Final Integrated Solution
+# Lighthouse - Final Integrated Solution
 ## NASA Space Apps Challenge 2025
 
 > *"The Earth is watching. Now you can too."*
@@ -7,7 +7,7 @@
 
 ## 🎯 Mission Complete
 
-ClearSkies has evolved from a basic Flask API into a production-grade unified air quality intelligence platform that merges data from space, earth, and sky into actionable insights.
+Lighthouse has evolved from a basic Flask API into a production-grade unified air quality intelligence platform that merges data from space, earth, and sky into actionable insights.
 
 ---
 
@@ -133,7 +133,7 @@ ClearSkies has evolved from a basic Flask API into a production-grade unified ai
 ```
 ═══════════════════════════════════════════════════════════════════════════
 ║                                                                         ║
-║                      🌤️  ClearSkies API v2                                ║
+║                      🌤️  Lighthouse API v2                                ║
 ║                                                                         ║
 ║        Powered by Space & Earth Intelligence                           ║
 ║                                                                         ║
@@ -146,7 +146,7 @@ Air quality intelligence from three worlds:
 
 ───────────────────────────────────────────────────────────────────────────
 
-✓  ClearSkies API v2.0.0 initialized
+✓  Lighthouse API v2.0.0 initialized
 ℹ  Listening on http://0.0.0.0:5001
 ℹ  TEMPO data: ../data/raw/tempo
 ℹ  Cache TTL: 300s
@@ -395,7 +395,7 @@ Built with precision. Designed for impact. Crafted with love.
 
 ---
 
-*ClearSkies v2.0.0 - NASA Space Apps Challenge 2025*
+*Lighthouse v2.0.0 - NASA Space Apps Challenge 2025*
 
 **Created by:** [Your Team Name]
 **Date:** October 2025
