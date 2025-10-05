@@ -375,7 +375,7 @@ const Compare = () => {
               </AreaChart>
             </ResponsiveContainer>
 
-            <div className="mt-6 text-center text-sm text-gray-600">
+            <div className="mt-6 text-center text-sm text-gray-700 font-medium">
               Data points represent satellite measurements every 6 hours over the past 7 days
             </div>
           </motion.div>
@@ -397,8 +397,8 @@ const Compare = () => {
                 Why Satellite Data?
               </h3>
 
-              <div className="space-y-3 text-gray-700">
-                <p>
+              <div className="space-y-3">
+                <p className="text-gray-800 text-base">
                   <strong className="text-blue-700">NASA TEMPO</strong> is a revolutionary satellite that measures air pollution from space, providing continuous coverage even in areas without ground monitoring stations.
                 </p>
 
@@ -408,7 +408,7 @@ const Compare = () => {
                       <ArrowRight className="text-blue-600" size={16} />
                       Satellite Advantages
                     </h4>
-                    <ul className="text-sm space-y-1 text-gray-600">
+                    <ul className="text-sm space-y-1 text-gray-700 font-medium">
                       <li>✓ Continuous 24/7 coverage</li>
                       <li>✓ Monitors entire regions</li>
                       <li>✓ No gaps in rural areas</li>
@@ -421,7 +421,7 @@ const Compare = () => {
                       <ArrowRight className="text-blue-600" size={16} />
                       Ground Stations
                     </h4>
-                    <ul className="text-sm space-y-1 text-gray-600">
+                    <ul className="text-sm space-y-1 text-gray-700 font-medium">
                       <li>✓ Highly accurate point measurements</li>
                       <li>✓ Limited to specific locations</li>
                       <li>✗ Often unavailable in many areas</li>
@@ -430,7 +430,7 @@ const Compare = () => {
                   </div>
                 </div>
 
-                <p className="mt-4 text-sm">
+                <p className="mt-4 text-sm text-gray-800 font-medium">
                   Lighthouse uses satellite data to ensure you always have access to air quality information, regardless of your location. This temporal view shows how air quality changes over time, helping you plan outdoor activities and understand pollution patterns.
                 </p>
               </div>
