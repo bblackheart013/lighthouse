@@ -1,17 +1,101 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ClearSkies v3 - The Earth is Watching</title>
-    <meta name="description" content="Real-time air quality intelligence powered by NASA TEMPO satellite data" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Primary Meta Tags -->
+    <title>ClearSkies - Real-Time Air Quality Intelligence</title>
+    <meta name="title" content="ClearSkies - Real-Time Air Quality Intelligence" />
+    <meta name="description" content="Real-time air quality monitoring powered by NASA TEMPO satellite data. Get accurate AQI forecasts, health recommendations, and wildfire alerts for your location." />
+    <meta name="keywords" content="air quality, AQI, air pollution, NASA TEMPO, satellite data, air quality index, environmental monitoring, weather, health" />
+    <meta name="author" content="ClearSkies Team" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#3b82f6" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://clearskies.app/" />
+    <meta property="og:title" content="ClearSkies - Real-Time Air Quality Intelligence" />
+    <meta property="og:description" content="Real-time air quality monitoring powered by NASA TEMPO satellite data. Get accurate AQI forecasts and health recommendations." />
+    <meta property="og:image" content="https://clearskies.app/og-image.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://clearskies.app/" />
+    <meta property="twitter:title" content="ClearSkies - Real-Time Air Quality Intelligence" />
+    <meta property="twitter:description" content="Real-time air quality monitoring powered by NASA TEMPO satellite data. Get accurate AQI forecasts and health recommendations." />
+    <meta property="twitter:image" content="https://clearskies.app/og-image.png" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <!-- Leaflet CSS for maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin="" />
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "ClearSkies",
+      "description": "Real-time air quality monitoring powered by NASA TEMPO satellite data",
+      "url": "https://clearskies.app",
+      "applicationCategory": "EnvironmentalApplication",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "ClearSkies Team"
+      }
+    }
+    </script>
+
+    <style>
+      /* Prevent flash of unstyled content */
+      body {
+        margin: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+          'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #0f172a;
+      }
+
+      /* Print styles */
+      @media print {
+        body {
+          background: white;
+          color: black;
+        }
+
+        .no-print {
+          display: none !important;
+        }
+      }
+    </style>
   </head>
   <body>
+    <!-- React Root -->
     <div id="root"></div>
+
+    <!-- Main App Script -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

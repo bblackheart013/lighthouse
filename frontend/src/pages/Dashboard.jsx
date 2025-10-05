@@ -1,62 +1,97 @@
 /**
- * ClearSkies v3 - Dashboard
+ * ClearSkies v3 - Dashboard (PRODUCTION ENHANCED)
  * Real-time air quality awareness powered by NASA TEMPO
+ *
+ * New v3 Features:
+ * - Live data indicators with countdown timer
+ * - Auto-refresh every 60 seconds
+ * - Data export (PDF/JSON) and sharing
+ * - Mini sparklines for trend visualization
+ * - Quick Facts and health tips
+ * - Professional loading skeletons
  */
 
-import React, { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { Cloud, Wind, Droplets, AlertCircle, Activity } from 'lucide-react'
-import LoadingSpinner from '../components/LoadingSpinner'
+import React, { useState, useEffect, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Cloud, Wind, Droplets, AlertCircle, Activity, Radio, TrendingUp, TrendingDown, Zap, Sun, Moon, Umbrella } from 'lucide-react'
+import CountUp from 'react-countup'
+import { DashboardSkeleton } from '../components/Skeleton'
 import WildfireAlert from '../components/WildfireAlert'
+import DataExport from '../components/DataExport'
+import { MetricTooltip } from '../components/Tooltip'
+import BreathScoreCard from '../components/BreathScoreCard'
+import WeatherCard from '../components/WeatherCard'
+import LiveDataFeed from '../components/LiveDataFeed'
+import Globe3D from '../components/Globe3D'
+import TempoDataIndicator from '../components/TempoDataIndicator'
 import { apiService } from '../services/api'
-import { getAQIColor, getAQIGradient, getAQILabel, getHealthRecommendation } from '../utils/aqi'
+import { getAQIColor, getAQIGradient, getAQILabel, getHealthRecommendation, getAQITrend } from '../utils/aqi'
 import { useLocation } from '../context/LocationContext'
+import { formatDistanceToNow } from 'date-fns'
 
 const Dashboard = () => {
   const [data, setData] = useState(null)
   const [wildfireData, setWildfireData] = useState(null)
   const [groundData, setGroundData] = useState(null)
+  const [breathData, setBreathData] = useState(null)
+  const [weatherData, setWeatherData] = useState(null)
+  const [locationDetails, setLocationDetails] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [lastUpdate, setLastUpdate] = useState(new Date())
+  const [countdown, setCountdown] = useState(60)
   const { location } = useLocation()
 
   const { lat, lon, city } = location
+
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true)
+
+      // Fetch all data in parallel
+      const [forecast, wildfires, ground, breath, weather, locDetails] = await Promise.all([
+        apiService.getForecast(lat, lon, city),
+        apiService.getWildfires(lat, lon, 100),
+        apiService.getGroundSensors(lat, lon),
+        apiService.getBreathScore(lat, lon).catch(() => null),
+        apiService.getWeather(lat, lon).catch(() => null),
+        apiService.reverseGeocode(lat, lon).catch(() => null)
+      ])
+
+      setData(forecast)
+      setWildfireData(wildfires)
+      setGroundData(ground?.data || {})
+      setBreathData(breath)
+      setWeatherData(weather)
+      setLocationDetails(locDetails)
+      setError(null)
+      setLastUpdate(new Date())
+      setCountdown(60)
+    } catch (err) {
+      console.error('Error fetching data:', err)
+      console.error('Error details:', err.response?.data || err.message)
+      setError(`Failed to load air quality data: ${err.response?.data?.message || err.message || 'Unknown error'}`)
+    } finally {
+      setLoading(false)
+    }
+  }, [lat, lon, city])
 
   useEffect(() => {
     fetchData()
     // Refresh every 60 seconds
     const interval = setInterval(fetchData, 60000)
     return () => clearInterval(interval)
-  }, [lat, lon])
+  }, [fetchData])
 
-  const fetchData = async () => {
-    try {
-      setLoading(true)
+  // Countdown timer for next refresh
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown(prev => (prev > 0 ? prev - 1 : 60))
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [])
 
-      // Fetch all data in parallel
-      const [forecast, wildfires, ground] = await Promise.all([
-        apiService.getForecast(lat, lon, city),
-        apiService.getWildfires(lat, lon, 100),
-        apiService.getGroundSensors(lat, lon)
-      ])
-
-      setData(forecast)
-      setWildfireData(wildfires)
-      setGroundData(ground?.data || {})
-      setError(null)
-    } catch (err) {
-      console.error('Error fetching data:', err)
-      setError('Failed to load air quality data')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <LoadingSpinner />
-    </div>
-  )
+  if (loading && !data) return <DashboardSkeleton />
 
   if (error) return (
     <div className="min-h-screen flex items-center justify-center">
@@ -83,22 +118,88 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+      {/* Interactive Globe3D - FIRST THING ON PAGE */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8 }}
+        className="relative"
+      >
+        <div className="bg-gradient-to-br from-slate-900 via-gray-900 to-black">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
+            <div className="text-center mb-6">
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-3 bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
+                🌍 Explore Earth
+              </h2>
+              <p className="text-white/80 text-lg md:text-xl font-medium">
+                Click anywhere on Earth to see air quality in real-time
+              </p>
+              <p className="text-white/60 text-sm mt-2">
+                Interactive 3D globe powered by NASA satellite data
+              </p>
+            </div>
+
+            <div className="flex justify-center" style={{ minHeight: '600px' }}>
+              <Globe3D
+                key={`${location.lat}-${location.lon}`}
+                selectedLocation={location}
+                onLocationClick={(clickedLat, clickedLon) => {
+                  console.log('Globe clicked:', clickedLat, clickedLon)
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Hero AQI Display */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
         className="relative overflow-hidden"
         style={{ background: gradient }}
       >
+        {/* Real-Time Indicator & Export */}
+        <div className="absolute top-4 right-4 flex items-center gap-3 z-20">
+          <DataExport data={data} location={location} />
+
+          {/* Live Indicator */}
+          <div className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-lg rounded-lg border border-white/20">
+            <div className="relative">
+              <Radio className="text-green-400 animate-pulse-glow" size={16} />
+              <div className="absolute inset-0 bg-green-400 blur-md opacity-50 animate-pulse" />
+            </div>
+            <div className="text-white text-sm font-semibold">
+              LIVE
+            </div>
+          </div>
+        </div>
+
+        {/* Auto-refresh Timer */}
+        <div className="absolute top-4 left-4 z-20">
+          <div className="flex items-center gap-2 px-3 py-2 bg-white/10 backdrop-blur-lg rounded-lg border border-white/20 text-white text-xs">
+            <Activity size={14} className="text-blue-400" />
+            <span>Next update: {countdown}s</span>
+          </div>
+        </div>
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
           <h1 className="text-white text-2xl md:text-3xl font-light mb-4">
-            {apiLocation.city || `${apiLocation.lat}, ${apiLocation.lon}`}
+            {locationDetails?.city || apiLocation.city || `${apiLocation.lat}, ${apiLocation.lon}`}
           </h1>
+          {locationDetails?.precision && (
+            <p className="text-white/60 text-sm mb-2">
+              Precise location: {locationDetails.neighborhood || locationDetails.city}
+              {locationDetails.state && `, ${locationDetails.state}`}
+              {locationDetails.country && `, ${locationDetails.country}`}
+              {' '}(±{locationDetails.precision}m accuracy)
+            </p>
+          )}
 
-          {/* Giant AQI Number */}
+          {/* Giant AQI Number with CountUp */}
           <div className="text-white text-9xl md:text-[12rem] font-black leading-none mb-4">
-            {aqi}
+            <CountUp end={aqi} duration={1.5} />
           </div>
 
           <div className="text-white text-3xl md:text-4xl font-semibold mb-6">
@@ -109,6 +210,11 @@ const Dashboard = () => {
           <p className="text-white/90 text-lg md:text-xl max-w-2xl mx-auto">
             {health_guidance.general_public || getHealthRecommendation(aqi)}
           </p>
+
+          {/* Last Updated */}
+          <p className="text-white/50 text-sm mt-6">
+            Updated {formatDistanceToNow(lastUpdate, { addSuffix: true })}
+          </p>
         </div>
 
         {/* Decorative gradient overlay */}
@@ -117,8 +223,83 @@ const Dashboard = () => {
 
       {/* Details Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Umbrella Alert Banner */}
+        {weatherData?.umbrella_needed && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8 p-6 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-2xl shadow-2xl"
+          >
+            <div className="flex items-center gap-4 text-white">
+              <div className="p-4 bg-white/20 rounded-full">
+                <Umbrella size={32} />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold mb-1">Umbrella Alert</h3>
+                <p className="text-blue-50 text-lg">
+                  {weatherData.umbrella_needed.message || 'Rain expected today - bring an umbrella!'}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* Wildfire Alert */}
-        {wildfireData && <WildfireAlert wildfireData={wildfireData} />}
+        {wildfireData && wildfireData.wildfire_detected && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8"
+          >
+            <WildfireAlert wildfireData={wildfireData} />
+            {wildfireData.closest_fire && locationDetails && (
+              <div className="mt-4 p-6 bg-orange-50 border border-orange-200 rounded-2xl">
+                <h4 className="text-lg font-bold text-orange-800 mb-3">Wildfire Location Details</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-semibold text-gray-700">Coordinates: </span>
+                    <span className="text-gray-600">
+                      {wildfireData.closest_fire.latitude.toFixed(4)}, {wildfireData.closest_fire.longitude.toFixed(4)}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-700">Distance: </span>
+                    <span className="text-gray-600">{wildfireData.closest_fire.distance_km.toFixed(1)} km away</span>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-700">Brightness: </span>
+                    <span className="text-gray-600">{wildfireData.closest_fire.brightness}K</span>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-700">Confidence: </span>
+                    <span className="text-gray-600">{wildfireData.closest_fire.confidence}%</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* Featured Cards: Breath Score & Weather */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <BreathScoreCard breathData={breathData} loading={loading && !breathData} />
+          <WeatherCard weatherData={weatherData} aqi={aqi} loading={loading && !weatherData} />
+        </div>
+
+        {/* NASA TEMPO Satellite Data Indicator */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="mb-8"
+        >
+          <TempoDataIndicator forecastData={data} />
+        </motion.div>
+
+        {/* Live Data Feed */}
+        <div className="mb-8">
+          <LiveDataFeed />
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Weather Info */}
@@ -347,13 +528,99 @@ const Dashboard = () => {
             </p>
           </motion.div>
 
+        {/* Quick Facts & Health Tips */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="mt-12 bg-gradient-to-br from-blue-500/10 to-purple-500/10 backdrop-blur-lg rounded-2xl p-8 border border-white/10"
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <Zap className="w-8 h-8 text-yellow-400" />
+            <h3 className="text-2xl font-bold text-white">Quick Facts</h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* AQI Explainer */}
+            <div className="bg-white/5 rounded-xl p-6 border border-white/10">
+              <h4 className="text-lg font-semibold text-white mb-3">What is AQI?</h4>
+              <p className="text-white/70 text-sm leading-relaxed">
+                The Air Quality Index (AQI) is an EPA standard that tells you how clean or polluted your air is.
+                Values range from 0-500, where higher values indicate greater health concerns.
+              </p>
+            </div>
+
+            {/* Best Time for Activities */}
+            <div className="bg-white/5 rounded-xl p-6 border border-white/10">
+              <h4 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                <Sun className="text-yellow-400" size={20} />
+                Best Time for Activities
+              </h4>
+              <p className="text-white/70 text-sm leading-relaxed">
+                {aqi <= 50 ?
+                  "Perfect conditions! Any time is great for outdoor activities." :
+                  aqi <= 100 ?
+                  "Early morning or evening when temperatures are cooler." :
+                  aqi <= 150 ?
+                  "Limit strenuous outdoor activities. Stay indoors during peak hours." :
+                  "Avoid all outdoor activities. Stay indoors with air filtration."
+                }
+              </p>
+            </div>
+
+            {/* Protection Tips */}
+            <div className="bg-white/5 rounded-xl p-6 border border-white/10">
+              <h4 className="text-lg font-semibold text-white mb-3">Protection Tips</h4>
+              <ul className="text-white/70 text-sm space-y-2">
+                {aqi <= 100 ? (
+                  <>
+                    <li>✓ Enjoy outdoor activities</li>
+                    <li>✓ Stay hydrated</li>
+                    <li>✓ Monitor local forecasts</li>
+                  </>
+                ) : (
+                  <>
+                    <li>✓ Wear an N95 mask outdoors</li>
+                    <li>✓ Use air purifiers indoors</li>
+                    <li>✓ Keep windows closed</li>
+                    <li>✓ Limit outdoor exposure</li>
+                  </>
+                )}
+              </ul>
+            </div>
+          </div>
+
+          {/* 7-Day Forecast Preview */}
+          {prediction.confidence && (
+            <div className="mt-6 pt-6 border-t border-white/10">
+              <h4 className="text-lg font-semibold text-white mb-3">Forecast Confidence</h4>
+              <div className="flex items-center gap-4">
+                <div className="flex-1 bg-white/5 rounded-full h-3 overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      prediction.confidence === 'high' ? 'bg-green-500 w-full' :
+                      prediction.confidence === 'medium' ? 'bg-yellow-500 w-2/3' :
+                      'bg-orange-500 w-1/3'
+                    }`}
+                  />
+                </div>
+                <span className="text-white font-semibold capitalize">{prediction.confidence}</span>
+              </div>
+              <p className="text-white/50 text-xs mt-2">
+                Based on {data_sources.satellite?.data_points || 'multiple'} satellite data points
+                {data_sources.satellite?.r_squared && ` (R² = ${(data_sources.satellite.r_squared * 100).toFixed(1)}%)`}
+              </p>
+            </div>
+          )}
+        </motion.div>
+
         {/* NASA Attribution */}
         <div className="mt-12 text-center">
           <p className="text-white/50 text-sm">
             Data from NASA TEMPO Satellite • OpenAQ Ground Sensors • NOAA Weather Service
           </p>
           <p className="text-white/30 text-xs mt-2">
-            Last updated: {new Date().toLocaleTimeString()}
+            Last updated: {formatDistanceToNow(lastUpdate, { addSuffix: true })}
           </p>
         </div>
       </div>

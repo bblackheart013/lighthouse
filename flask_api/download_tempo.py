@@ -11,11 +11,11 @@ import sys
 
 def download_tempo_data(
     product="TEMPO_NO2_L3",
-    start_date="2024-09-01",
-    end_date="2024-09-05",
-    bbox=(-74.259, 40.477, -73.700, 40.917),  # NYC
+    start_date="2024-09-25",  # Most recent archived data before government shutdown
+    end_date="2024-09-30",
+    bbox=(-180, -90, 180, 90),  # Global coverage (TEMPO covers North America)
     output_dir="../data/raw/tempo",
-    max_files=5
+    max_files=20  # Get more data points for better predictions
 ):
     """
     Download TEMPO data files.
@@ -75,19 +75,19 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--start",
-        default="2024-09-01",
-        help="Start date YYYY-MM-DD (default: 2024-09-01)"
+        default="2024-09-25",
+        help="Start date YYYY-MM-DD (default: 2024-09-25 - most recent before gov shutdown)"
     )
     parser.add_argument(
         "--end",
-        default="2024-09-05",
-        help="End date YYYY-MM-DD (default: 2024-09-05)"
+        default="2024-09-30",
+        help="End date YYYY-MM-DD (default: 2024-09-30)"
     )
     parser.add_argument(
         "--max-files",
         type=int,
-        default=5,
-        help="Maximum files to download (default: 5)"
+        default=20,
+        help="Maximum files to download (default: 20)"
     )
 
     args = parser.parse_args()

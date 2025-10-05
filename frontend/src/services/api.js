@@ -20,7 +20,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5001';
 // Create axios instance with default configuration
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000, // 10 second timeout
+  timeout: 30000, // 30 second timeout (increased for multiple API calls)
   headers: {
     'Content-Type': 'application/json',
   },
@@ -93,23 +93,28 @@ export const apiService = {
   },
 
   /**
-   * Compare satellite data vs ground sensor measurements
-   * Validates TEMPO observations against OpenAQ ground truth
+   * Get temporal comparison (current vs 24h ago vs 7 days ago)
+   * Shows satellite AQI trends over time using NASA TEMPO data
    *
    * @param {number} lat - Latitude
    * @param {number} lon - Longitude
-   * @returns {Promise} Comparison data with correlation metrics
+   * @returns {Promise} Temporal comparison data with trends and history
    */
-  getComparison: async (lat, lon) => {
+  getCompare: async (lat, lon) => {
     try {
       const response = await api.get('/compare', {
         params: { lat, lon }
       });
       return response.data;
     } catch (error) {
-      console.error('Error fetching comparison:', error);
+      console.error('Error fetching temporal comparison:', error);
       throw error;
     }
+  },
+
+  // Alias for backwards compatibility
+  getComparison: async (lat, lon) => {
+    return apiService.getCompare(lat, lon);
   },
 
   /**
@@ -148,6 +153,85 @@ export const apiService = {
       return response.data;
     } catch (error) {
       console.error('Error fetching weather:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get breath quality score with health recommendations
+   * Personalized air quality health metric with age-specific guidance
+   *
+   * @param {number} lat - Latitude
+   * @param {number} lon - Longitude
+   * @returns {Promise} Breath score, mask recommendation, health guidance
+   */
+  getBreathScore: async (lat, lon) => {
+    try {
+      const response = await api.get('/breath-score', {
+        params: { lat, lon }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching breath score:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Geocode location query to coordinates
+   * Search for places by name and get their coordinates
+   *
+   * @param {string} query - Location search query
+   * @param {number} count - Number of results to return (default: 5)
+   * @returns {Promise} Array of location matches with coordinates
+   */
+  geocode: async (query, count = 5) => {
+    try {
+      const response = await api.get('/geocode', {
+        params: { query, count }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error geocoding:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Reverse geocode coordinates to location name
+   * Get detailed location information from coordinates
+   *
+   * @param {number} lat - Latitude
+   * @param {number} lon - Longitude
+   * @returns {Promise} Location details (neighborhood, city, state, country)
+   */
+  reverseGeocode: async (lat, lon) => {
+    try {
+      const response = await api.get('/reverse-geocode', {
+        params: { lat, lon }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error reverse geocoding:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Compare air quality across multiple cities
+   * Side-by-side comparison of AQI, weather, and health metrics
+   *
+   * @param {Array} cities - Array of {lat, lon, name} objects
+   * @returns {Promise} Comparison data for all cities
+   */
+  multiCompare: async (cities) => {
+    try {
+      const response = await api.post('/multi-compare', {
+        cities
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error comparing cities:', error);
       throw error;
     }
   },

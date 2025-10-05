@@ -181,13 +181,101 @@ class TempoService:
         }
 
 
+class WAQIService:
+    """
+    World Air Quality Index (WAQI) - Real-time AQI used by weather apps globally.
+    This is the SAME data source used by iPhone Weather, Google, and other major apps.
+    """
+
+    # WAQI API token - Real-time global AQI data (same as Apple Maps, Google Weather)
+    WAQI_API_TOKEN = "43cfcad37b4ae4cd7e2264e319cb9c256bef7e7b"
+    WAQI_API_BASE = "https://api.waqi.info"
+
+    @staticmethod
+    def get_real_time_aqi(lat: float, lon: float) -> Dict[str, Any]:
+        """
+        Get REAL-TIME AQI from WAQI - the exact same data weather apps use.
+
+        Returns:
+            AQI, dominant pollutant, and all pollutant concentrations
+        """
+        try:
+            # Get AQI from nearest station
+            url = f"{WAQIService.WAQI_API_BASE}/feed/geo:{lat};{lon}/"
+            params = {'token': WAQIService.WAQI_API_TOKEN}
+
+            response = requests.get(url, params=params, timeout=10)
+
+            if response.status_code != 200:
+                return None
+
+            data = response.json()
+
+            if data.get('status') != 'ok':
+                return None
+
+            station_data = data.get('data', {})
+
+            # Extract AQI and pollutants
+            aqi = station_data.get('aqi')
+            if aqi == '-' or aqi is None:
+                return None
+
+            # Get individual pollutants
+            iaqi = station_data.get('iaqi', {})
+            pollutants = {}
+
+            for pollutant, value_data in iaqi.items():
+                if isinstance(value_data, dict) and 'v' in value_data:
+                    pollutants[pollutant.upper()] = {
+                        'aqi': value_data['v'],
+                        'source': 'WAQI Ground Stations'
+                    }
+
+            # Determine dominant pollutant
+            dominant_pollutant = station_data.get('dominentpol', 'pm25').upper()
+
+            return {
+                'aqi': int(aqi),
+                'dominant_pollutant': dominant_pollutant,
+                'pollutants': pollutants,
+                'station': {
+                    'name': station_data.get('city', {}).get('name', 'Unknown'),
+                    'coordinates': station_data.get('city', {}).get('geo', []),
+                    'url': station_data.get('city', {}).get('url', '')
+                },
+                'timestamp': station_data.get('time', {}).get('iso', ''),
+                'source': 'World Air Quality Index (WAQI) - Used by major weather apps'
+            }
+
+        except Exception as e:
+            print(f"WAQI API Error: {str(e)}")
+            return None
+
+    @staticmethod
+    def _get_aqi_category(aqi: int) -> str:
+        """Get AQI category from numeric value"""
+        if aqi <= 50:
+            return 'Good'
+        elif aqi <= 100:
+            return 'Moderate'
+        elif aqi <= 150:
+            return 'Unhealthy for Sensitive Groups'
+        elif aqi <= 200:
+            return 'Unhealthy'
+        elif aqi <= 300:
+            return 'Very Unhealthy'
+        else:
+            return 'Hazardous'
+
+
 class OpenAQService:
     """OpenAQ - Truth from the ground, measured where we breathe."""
 
     @staticmethod
     def get_measurements(lat: float, lon: float, radius_km: float = 25) -> Dict[str, Any]:
         """
-        Gather ground-based measurements from nearby sensors.
+        Gather ground-based measurements from nearby sensors using OpenAQ v3 API.
         The human perspective - air quality at street level.
 
         Returns comprehensive pollutant data including:
@@ -199,64 +287,171 @@ class OpenAQService:
         - O3 (Ozone)
         """
         try:
-            url = f"{config.OPENAQ_API}/latest"
+            # Step 1: Get nearby locations
+            locations_url = f"{config.OPENAQ_API}/locations"
             params = {
                 'coordinates': f"{lat},{lon}",
                 'radius': radius_km * 1000,
-                'limit': 10  # Increased to get more pollutant types
+                'limit': 10
+            }
+            headers = {
+                'X-API-Key': config.OPENAQ_API_KEY
             }
 
-            response = requests.get(url, params=params, timeout=10)
+            locations_response = requests.get(locations_url, params=params, headers=headers, timeout=10)
 
-            if response.status_code != 200:
+            if locations_response.status_code != 200:
                 return None
 
-            data = response.json()
-            results = data.get('results', [])
+            locations_data = locations_response.json()
+            locations = locations_data.get('results', [])
 
-            if not results:
+            if not locations:
                 return None
 
-            # Aggregate measurements from all nearby stations
-            # Prioritize these pollutants for environmental metrics
-            priority_pollutants = ['pm25', 'pm10', 'no2', 'co', 'so2', 'o3']
+            # Step 2: Collect measurements from all nearby locations
             aggregated = {}
+            sensor_cache = {}  # Cache sensor metadata to reduce API calls
 
-            for station in results:
-                for measurement in station.get('measurements', []):
-                    param = measurement.get('parameter')
-                    value = measurement.get('value')
-                    unit = measurement.get('unit')
+            for location in locations:
+                location_id = location.get('id')
 
-                    if param and value:
-                        # Normalize parameter name
-                        param_normalized = param.lower().replace('.', '').replace('_', '')
+                # Get latest measurements for this location
+                latest_url = f"{config.OPENAQ_API}/locations/{location_id}/latest"
+                latest_response = requests.get(latest_url, headers=headers, timeout=10)
 
-                        if param_normalized not in aggregated:
-                            aggregated[param_normalized] = {'values': [], 'unit': unit}
-                        aggregated[param_normalized]['values'].append(value)
+                if latest_response.status_code == 200:
+                    latest_data = latest_response.json()
+                    measurements = latest_data.get('results', [])
 
-            # Calculate averages and format output
+                    for measurement in measurements:
+                        sensor_id = measurement.get('sensorsId')
+                        value = measurement.get('value')
+
+                        if sensor_id and value is not None:
+                            # Get or fetch sensor metadata
+                            if sensor_id not in sensor_cache:
+                                sensor_url = f"{config.OPENAQ_API}/sensors/{sensor_id}"
+                                sensor_response = requests.get(sensor_url, headers=headers, timeout=10)
+
+                                if sensor_response.status_code == 200:
+                                    sensor_data = sensor_response.json()
+                                    sensor_results = sensor_data.get('results', [])
+                                    if sensor_results:
+                                        sensor_cache[sensor_id] = sensor_results[0]
+                                else:
+                                    continue
+
+                            sensor_info = sensor_cache.get(sensor_id)
+                            if sensor_info:
+                                param_info = sensor_info.get('parameter', {})
+                                param_name = param_info.get('name', '').lower()
+                                param_unit = param_info.get('units', '')
+
+                                if param_name:
+                                    # Normalize parameter name
+                                    param_normalized = param_name.replace('.', '').replace('_', '')
+
+                                    if param_normalized not in aggregated:
+                                        aggregated[param_normalized] = {'values': [], 'unit': param_unit, 'display_name': param_info.get('displayName', param_name.upper())}
+                                    aggregated[param_normalized]['values'].append(value)
+
+            # Step 3: Calculate averages and format output
             averaged = {}
             for param, data in aggregated.items():
-                # Convert back to standard names
-                standard_name = param.upper()
-                if param == 'pm25':
-                    standard_name = 'PM2.5'
-                elif param == 'pm10':
-                    standard_name = 'PM10'
+                # Use display name from API
+                standard_name = data['display_name']
 
                 averaged[standard_name] = {
                     'value': round(np.mean(data['values']), 2),
                     'unit': data['unit'],
                     'source': 'OpenAQ Ground Stations',
+                    'sample_count': len(data['values']),
                     'quality': OpenAQService._assess_pollutant_quality(standard_name, round(np.mean(data['values']), 2))
                 }
 
             return averaged if averaged else None
 
-        except Exception:
+        except Exception as e:
+            # Log error for debugging but return None to maintain API consistency
+            print(f"OpenAQ API Error: {str(e)}")
             return None
+
+    @staticmethod
+    def calculate_pollutant_aqi(pollutant: str, value: float) -> int:
+        """
+        Calculate AQI from pollutant concentration using US EPA formula.
+
+        Args:
+            pollutant: Pollutant name (PM2.5, PM10, NO2, CO, SO2, O3)
+            value: Concentration value in standard units
+
+        Returns:
+            AQI value (0-500+)
+        """
+        # US EPA AQI breakpoints: (C_low, C_high, AQI_low, AQI_high)
+        breakpoints = {
+            'PM2.5': [
+                (0.0, 12.0, 0, 50),
+                (12.1, 35.4, 51, 100),
+                (35.5, 55.4, 101, 150),
+                (55.5, 150.4, 151, 200),
+                (150.5, 250.4, 201, 300),
+                (250.5, 500.4, 301, 500)
+            ],
+            'PM10': [
+                (0, 54, 0, 50),
+                (55, 154, 51, 100),
+                (155, 254, 101, 150),
+                (255, 354, 151, 200),
+                (355, 424, 201, 300),
+                (425, 604, 301, 500)
+            ],
+            'NO2': [
+                (0, 53, 0, 50),
+                (54, 100, 51, 100),
+                (101, 360, 101, 150),
+                (361, 649, 151, 200),
+                (650, 1249, 201, 300),
+                (1250, 2049, 301, 500)
+            ],
+            'O3': [
+                (0, 54, 0, 50),
+                (55, 70, 51, 100),
+                (71, 85, 101, 150),
+                (86, 105, 151, 200),
+                (106, 200, 201, 300)
+            ],
+            'CO': [
+                (0.0, 4.4, 0, 50),
+                (4.5, 9.4, 51, 100),
+                (9.5, 12.4, 101, 150),
+                (12.5, 15.4, 151, 200),
+                (15.5, 30.4, 201, 300),
+                (30.5, 50.4, 301, 500)
+            ],
+            'SO2': [
+                (0, 35, 0, 50),
+                (36, 75, 51, 100),
+                (76, 185, 101, 150),
+                (186, 304, 151, 200),
+                (305, 604, 201, 300),
+                (605, 1004, 301, 500)
+            ]
+        }
+
+        if pollutant not in breakpoints:
+            return None
+
+        # Find the appropriate breakpoint
+        for c_low, c_high, aqi_low, aqi_high in breakpoints[pollutant]:
+            if c_low <= value <= c_high:
+                # Linear interpolation: AQI = ((AQI_high - AQI_low) / (C_high - C_low)) * (C - C_low) + AQI_low
+                aqi = ((aqi_high - aqi_low) / (c_high - c_low)) * (value - c_low) + aqi_low
+                return int(round(aqi))
+
+        # If exceeds all breakpoints, return hazardous
+        return 500
 
     @staticmethod
     def _assess_pollutant_quality(pollutant: str, value: float) -> str:
@@ -270,31 +465,24 @@ class OpenAQService:
         Returns:
             Quality assessment: 'good', 'moderate', 'unhealthy', 'very_unhealthy', 'hazardous'
         """
-        # EPA Air Quality Index breakpoints (simplified)
-        breakpoints = {
-            'PM2.5': [(0, 12, 'good'), (12.1, 35.4, 'moderate'), (35.5, 55.4, 'unhealthy_sensitive'),
-                      (55.5, 150.4, 'unhealthy'), (150.5, 250.4, 'very_unhealthy'), (250.5, 500, 'hazardous')],
-            'PM10': [(0, 54, 'good'), (55, 154, 'moderate'), (155, 254, 'unhealthy_sensitive'),
-                     (255, 354, 'unhealthy'), (355, 424, 'very_unhealthy'), (425, 604, 'hazardous')],
-            'NO2': [(0, 53, 'good'), (54, 100, 'moderate'), (101, 360, 'unhealthy_sensitive'),
-                    (361, 649, 'unhealthy'), (650, 1249, 'very_unhealthy'), (1250, 2049, 'hazardous')],
-            'O3': [(0, 54, 'good'), (55, 70, 'moderate'), (71, 85, 'unhealthy_sensitive'),
-                   (86, 105, 'unhealthy'), (106, 200, 'very_unhealthy')],
-            'CO': [(0, 4.4, 'good'), (4.5, 9.4, 'moderate'), (9.5, 12.4, 'unhealthy_sensitive'),
-                   (12.5, 15.4, 'unhealthy'), (15.5, 30.4, 'very_unhealthy'), (30.5, 50.4, 'hazardous')],
-            'SO2': [(0, 35, 'good'), (36, 75, 'moderate'), (76, 185, 'unhealthy_sensitive'),
-                    (186, 304, 'unhealthy'), (305, 604, 'very_unhealthy'), (605, 1004, 'hazardous')]
-        }
+        # Calculate AQI and map to category
+        aqi = OpenAQService.calculate_pollutant_aqi(pollutant, value)
 
-        if pollutant not in breakpoints:
+        if aqi is None:
             return 'unknown'
 
-        for min_val, max_val, quality in breakpoints[pollutant]:
-            if min_val <= value <= max_val:
-                return quality
-
-        # If exceeds all breakpoints
-        return 'hazardous'
+        if aqi <= 50:
+            return 'good'
+        elif aqi <= 100:
+            return 'moderate'
+        elif aqi <= 150:
+            return 'unhealthy_sensitive'
+        elif aqi <= 200:
+            return 'unhealthy'
+        elif aqi <= 300:
+            return 'very_unhealthy'
+        else:
+            return 'hazardous'
 
 
 class NOAAWeatherService:
@@ -402,16 +590,55 @@ class UnifiedForecastService:
                 'source': 'satellite'
             }
 
-        # Merge ground station data
+        # Merge ground station data and calculate composite AQI
+        pollutant_aqis = []  # Track all pollutant AQIs to find the worst (dominant pollutant)
+
         if ground:
             for pollutant, data in ground.items():
                 # Normalize pollutant names
                 clean_name = pollutant.upper().replace('.', '')
+
+                # Calculate AQI for this pollutant
+                pollutant_aqi = OpenAQService.calculate_pollutant_aqi(clean_name, data['value'])
+
                 forecast['pollutants'][clean_name] = {
                     'value': data['value'],
                     'unit': data['unit'],
-                    'source': 'ground'
+                    'source': 'ground',
+                    'aqi': pollutant_aqi
                 }
+
+                if pollutant_aqi is not None:
+                    pollutant_aqis.append({
+                        'pollutant': clean_name,
+                        'aqi': pollutant_aqi,
+                        'value': data['value']
+                    })
+
+        # Use the WORST pollutant AQI as the overall AQI (EPA standard)
+        # This ensures we show the most concerning pollutant
+        if pollutant_aqis:
+            worst_pollutant = max(pollutant_aqis, key=lambda x: x['aqi'])
+
+            # Only override satellite AQI if ground data shows worse conditions
+            if forecast['air_quality_index'] is None or worst_pollutant['aqi'] > forecast['air_quality_index']:
+                forecast['air_quality_index'] = worst_pollutant['aqi']
+                forecast['dominant_pollutant'] = worst_pollutant['pollutant']
+
+                # Update advisory based on composite AQI
+                aqi_val = worst_pollutant['aqi']
+                if aqi_val <= 50:
+                    forecast['advisory'] = 'Air quality excellent — ideal conditions for outdoor activity'
+                elif aqi_val <= 100:
+                    forecast['advisory'] = f'Air quality acceptable — outdoor activity safe for everyone (driven by {worst_pollutant["pollutant"]})'
+                elif aqi_val <= 150:
+                    forecast['advisory'] = f'Air quality moderate — sensitive groups should limit prolonged outdoor exertion (high {worst_pollutant["pollutant"]})'
+                elif aqi_val <= 200:
+                    forecast['advisory'] = f'Air quality unhealthy — everyone should reduce prolonged outdoor exertion (high {worst_pollutant["pollutant"]})'
+                elif aqi_val <= 300:
+                    forecast['advisory'] = f'Air quality very unhealthy — avoid outdoor activity (dangerous {worst_pollutant["pollutant"]} levels)'
+                else:
+                    forecast['advisory'] = f'Health alert: everyone may experience serious health effects — remain indoors (hazardous {worst_pollutant["pollutant"]} levels)'
 
         # Add weather context
         if weather:

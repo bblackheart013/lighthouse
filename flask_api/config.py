@@ -30,18 +30,19 @@ class Config:
     RATE_LIMIT_PER_MINUTE = 60
 
     # External API Endpoints
-    OPENAQ_API = "https://api.openaq.org/v2"
+    OPENAQ_API = "https://api.openaq.org/v3"
+    OPENAQ_API_KEY = "d754ea7eb02cad29d60b6fb7af706864a8b38847b54fe722d4d1a23d13bf4318"
     NOAA_WEATHER_API = "https://api.weather.gov"
 
     # Default Coordinates (New York City)
     DEFAULT_LATITUDE = 40.7128
     DEFAULT_LONGITUDE = -74.0060
 
-    # Geographic Bounds (North America - TEMPO coverage)
-    MIN_LATITUDE = 17.0
-    MAX_LATITUDE = 64.0
-    MIN_LONGITUDE = -140.0
-    MAX_LONGITUDE = -50.0
+    # Geographic Bounds (GLOBAL coverage)
+    MIN_LATITUDE = -90.0   # South Pole
+    MAX_LATITUDE = 90.0    # North Pole
+    MIN_LONGITUDE = -180.0 # Western hemisphere
+    MAX_LONGITUDE = 180.0  # Eastern hemisphere
 
     # Response Format
     JSON_SORT_KEYS = False  # Preserve logical ordering
@@ -50,11 +51,11 @@ class Config:
     @classmethod
     def validate_coordinates(cls, lat: float, lon: float) -> tuple[bool, str]:
         """
-        Validate if coordinates fall within TEMPO satellite coverage.
+        Validate if coordinates are valid global coordinates.
 
         Args:
-            lat: Latitude in degrees
-            lon: Longitude in degrees
+            lat: Latitude in degrees (-90 to 90)
+            lon: Longitude in degrees (-180 to 180)
 
         Returns:
             (valid, error_message) tuple

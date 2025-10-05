@@ -108,8 +108,8 @@ const WildfireAlert = ({ wildfireData }) => {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>
-                <p className="text-white/50">Distance</p>
-                <p className="text-white font-semibold">{closest_fire.distance_km} km</p>
+                <p className="text-white/50">Distance from you</p>
+                <p className="text-white font-semibold">{closest_fire.distance_km} km away</p>
               </div>
               <div>
                 <p className="text-white/50">Severity</p>

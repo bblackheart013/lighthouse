@@ -3,17 +3,23 @@
  *
  * Global location picker that allows users to search for any city worldwide
  * or enter custom coordinates to view air quality data anywhere on Earth.
+ *
+ * Enhanced with live geocoding API for real-time location search
  */
 
-import React, { useState } from 'react'
-import { MapPin, Search, Globe, X } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { MapPin, Search, Globe, X, Loader } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { apiService } from '../services/api'
 
 const LocationSelector = ({ onLocationChange, currentLocation }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [lat, setLat] = useState(currentLocation?.lat || '')
   const [lon, setLon] = useState(currentLocation?.lon || '')
+  const [searchResults, setSearchResults] = useState([])
+  const [isSearching, setIsSearching] = useState(false)
+  const [locationDetails, setLocationDetails] = useState(null)
 
   // Popular cities worldwide
   const popularCities = [
@@ -35,14 +41,65 @@ const LocationSelector = ({ onLocationChange, currentLocation }) => {
     { name: 'Jakarta, Indonesia', lat: -6.2088, lon: 106.8456 },
   ]
 
+  // Live search with geocoding API
+  useEffect(() => {
+    const searchLocations = async () => {
+      if (searchQuery.trim().length < 2) {
+        setSearchResults([])
+        return
+      }
+
+      setIsSearching(true)
+      try {
+        const results = await apiService.geocode(searchQuery, 8)
+        setSearchResults(results.results || [])
+      } catch (error) {
+        console.error('Geocoding error:', error)
+        setSearchResults([])
+      } finally {
+        setIsSearching(false)
+      }
+    }
+
+    const debounceTimer = setTimeout(searchLocations, 300)
+    return () => clearTimeout(debounceTimer)
+  }, [searchQuery])
+
+  // Get location details when coordinates change
+  useEffect(() => {
+    const fetchLocationDetails = async () => {
+      if (currentLocation?.lat && currentLocation?.lon) {
+        try {
+          const details = await apiService.reverseGeocode(currentLocation.lat, currentLocation.lon)
+          setLocationDetails(details)
+        } catch (error) {
+          console.error('Reverse geocoding error:', error)
+        }
+      }
+    }
+    fetchLocationDetails()
+  }, [currentLocation])
+
   const filteredCities = popularCities.filter(city =>
     city.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
+
+  // Show search results if searching, otherwise show filtered popular cities
+  const displayResults = searchQuery.trim().length >= 2 ? searchResults : filteredCities
 
   const handleCitySelect = (city) => {
     onLocationChange(city.lat, city.lon, city.name)
     setIsOpen(false)
     setSearchQuery('')
+    setSearchResults([])
+  }
+
+  const handleSearchResultSelect = (result) => {
+    const name = result.display_name || result.name || `${result.lat}, ${result.lon}`
+    onLocationChange(result.lat, result.lon, name)
+    setIsOpen(false)
+    setSearchQuery('')
+    setSearchResults([])
   }
 
   const handleCustomCoordinates = () => {
@@ -71,9 +128,16 @@ const LocationSelector = ({ onLocationChange, currentLocation }) => {
         className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white rounded-lg transition-all shadow-lg hover:shadow-xl"
       >
         <Globe className="w-5 h-5" />
-        <span className="font-medium">
-          {currentLocation?.city || `${currentLocation?.lat?.toFixed(2)}, ${currentLocation?.lon?.toFixed(2)}`}
-        </span>
+        <div className="text-left">
+          <span className="font-medium block">
+            {locationDetails?.city || currentLocation?.city || 'Select Location'}
+          </span>
+          {locationDetails?.precision && (
+            <span className="text-xs text-blue-100 block">
+              ±{locationDetails.precision}m precision
+            </span>
+          )}
+        </div>
       </button>
       {/* Modal */}
       <AnimatePresence>
@@ -125,27 +189,60 @@ const LocationSelector = ({ onLocationChange, currentLocation }) => {
 
               {/* Content */}
               <div className="p-6 overflow-y-auto max-h-96">
-                {/* Popular Cities Grid */}
+                {/* Search Results / Popular Cities */}
                 <div>
-                  <h3 className="text-lg font-bold text-slate-800 mb-4">Popular Cities</h3>
+                  <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center justify-between">
+                    <span>{searchQuery.trim().length >= 2 ? 'Search Results' : 'Popular Cities'}</span>
+                    {isSearching && <Loader className="animate-spin text-blue-600" size={20} />}
+                  </h3>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {filteredCities.map((city) => (
-                      <button
-                        key={city.name}
-                        onClick={() => handleCitySelect(city)}
-                        className="flex items-center justify-between p-4 bg-slate-50 hover:bg-blue-50 rounded-lg transition-colors text-left group"
-                      >
-                        <div>
-                          <p className="font-semibold text-slate-800 group-hover:text-blue-600">{city.name}</p>
-                          <p className="text-sm text-slate-600">{city.lat.toFixed(2)}, {city.lon.toFixed(2)}</p>
-                        </div>
-                        <MapPin className="text-slate-400 group-hover:text-blue-600" size={20} />
-                      </button>
-                    ))}
+                    {searchQuery.trim().length >= 2 ? (
+                      // Display search results from geocoding API
+                      searchResults.map((result, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleSearchResultSelect(result)}
+                          className="flex items-center justify-between p-4 bg-slate-50 hover:bg-blue-50 rounded-lg transition-colors text-left group"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-slate-800 group-hover:text-blue-600 truncate">
+                              {result.name}
+                            </p>
+                            <p className="text-xs text-slate-600 truncate">
+                              {result.display_name}
+                            </p>
+                            <p className="text-xs text-slate-500 mt-1">
+                              {result.lat.toFixed(4)}, {result.lon.toFixed(4)}
+                            </p>
+                          </div>
+                          <MapPin className="text-slate-400 group-hover:text-blue-600 ml-2 flex-shrink-0" size={20} />
+                        </button>
+                      ))
+                    ) : (
+                      // Display popular cities
+                      filteredCities.map((city) => (
+                        <button
+                          key={city.name}
+                          onClick={() => handleCitySelect(city)}
+                          className="flex items-center justify-between p-4 bg-slate-50 hover:bg-blue-50 rounded-lg transition-colors text-left group"
+                        >
+                          <div>
+                            <p className="font-semibold text-slate-800 group-hover:text-blue-600">{city.name}</p>
+                            <p className="text-sm text-slate-600">{city.lat.toFixed(2)}, {city.lon.toFixed(2)}</p>
+                          </div>
+                          <MapPin className="text-slate-400 group-hover:text-blue-600" size={20} />
+                        </button>
+                      ))
+                    )}
                   </div>
 
-                  {filteredCities.length === 0 && (
-                    <p className="text-center text-slate-500 py-8">No cities found. Try custom coordinates below.</p>
+                  {displayResults.length === 0 && !isSearching && (
+                    <p className="text-center text-slate-500 py-8">
+                      {searchQuery.trim().length >= 2
+                        ? 'No locations found. Try a different search or use custom coordinates below.'
+                        : 'No cities found. Try custom coordinates below.'}
+                    </p>
                   )}
                 </div>
 

@@ -13,19 +13,23 @@ import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { LocationProvider } from './context/LocationContext'
 import Navbar from './components/Navbar'
+import DataDisclaimer from './components/DataDisclaimer'
 import Footer from './components/Footer'
+import DataSourcesFooter from './components/DataSourcesFooter'
 import Dashboard from './pages/Dashboard'
 import Forecast from './pages/Forecast'
 import History from './pages/History'
 import Compare from './pages/Compare'
 import Alerts from './pages/Alerts'
 import About from './pages/About'
+import MultiCityCompare from './pages/MultiCityCompare'
 
 function App() {
   return (
     <LocationProvider>
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-50">
         <Navbar />
+        <DataDisclaimer />
 
         {/* Main content area - grows to fill available space */}
         <main className="flex-grow">
@@ -34,11 +38,13 @@ function App() {
             <Route path="/forecast" element={<Forecast />} />
             <Route path="/history" element={<History />} />
             <Route path="/compare" element={<Compare />} />
+            <Route path="/multi-compare" element={<MultiCityCompare />} />
             <Route path="/alerts" element={<Alerts />} />
             <Route path="/about" element={<About />} />
           </Routes>
         </main>
 
+        <DataSourcesFooter />
         <Footer />
       </div>
     </LocationProvider>

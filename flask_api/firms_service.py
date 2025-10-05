@@ -188,7 +188,7 @@ class FirmsService:
     @staticmethod
     def _get_mock_wildfire_data(lat: float, lon: float, radius_km: int) -> Dict[str, Any]:
         """
-        Generate mock wildfire data for demo purposes.
+        Generate mock wildfire data for demo purposes with exact coordinates.
 
         This is used when:
         - FIRMS API is unavailable
@@ -200,18 +200,28 @@ class FirmsService:
             radius_km: Search radius
 
         Returns:
-            Mock wildfire data matching FIRMS format
+            Mock wildfire data matching FIRMS format with precise coordinates
         """
         # Simulate realistic wildfire scenarios based on location
         mock_fires = []
 
         # Example: California-like coordinates often have fires
         if 32 <= lat <= 42 and -124 <= lon <= -114:
-            # Simulate 2 active fires
+            # Fire 1: Calculate exact coordinates and precise distance
+            fire1_lat = lat + 0.5
+            fire1_lon = lon - 0.3
+            fire1_distance = FirmsService._calculate_distance(lat, lon, fire1_lat, fire1_lon)
+
+            # Fire 2: Calculate exact coordinates and precise distance
+            fire2_lat = lat - 0.7
+            fire2_lon = lon + 0.4
+            fire2_distance = FirmsService._calculate_distance(lat, lon, fire2_lat, fire2_lon)
+
+            # Simulate 2 active fires with exact coordinates
             mock_fires = [
                 {
-                    'latitude': lat + 0.5,
-                    'longitude': lon - 0.3,
+                    'latitude': round(fire1_lat, 6),
+                    'longitude': round(fire1_lon, 6),
                     'brightness': 365.2,
                     'confidence': 85,
                     'scan': 1.2,
@@ -219,12 +229,12 @@ class FirmsService:
                     'acq_date': datetime.utcnow().strftime('%Y-%m-%d'),
                     'acq_time': '1430',
                     'satellite': 'VIIRS_SNPP',
-                    'distance_km': 55.3,
+                    'distance_km': round(fire1_distance, 2),
                     'severity': 'high'
                 },
                 {
-                    'latitude': lat - 0.7,
-                    'longitude': lon + 0.4,
+                    'latitude': round(fire2_lat, 6),
+                    'longitude': round(fire2_lon, 6),
                     'brightness': 342.8,
                     'confidence': 65,
                     'scan': 1.0,
@@ -232,12 +242,12 @@ class FirmsService:
                     'acq_date': datetime.utcnow().strftime('%Y-%m-%d'),
                     'acq_time': '1245',
                     'satellite': 'VIIRS_SNPP',
-                    'distance_km': 78.6,
+                    'distance_km': round(fire2_distance, 2),
                     'severity': 'moderate'
                 }
             ]
 
-        # Sort by distance
+        # Sort by distance (closest first)
         mock_fires.sort(key=lambda x: x['distance_km'])
 
         return {
@@ -246,5 +256,5 @@ class FirmsService:
             'closest_fire': mock_fires[0] if mock_fires else None,
             'search_radius_km': radius_km,
             'timestamp': datetime.utcnow().isoformat() + 'Z',
-            'note': 'Mock data - Configure FIRMS API key for real data'
+            'note': 'Mock data with precise coordinates - Configure FIRMS API key for real data'
         }

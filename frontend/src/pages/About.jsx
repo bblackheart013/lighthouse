@@ -98,6 +98,49 @@ const About = () => {
         </motion.p>
       </div>
 
+      {/* What Makes ClearSkies Different */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        className="mb-16"
+      >
+        <h2 className="text-3xl font-bold text-slate-800 text-center mb-12">
+          What Makes ClearSkies Different
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-6 border border-blue-100">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center mb-4">
+              <Satellite className="text-white" size={24} />
+            </div>
+            <h3 className="text-xl font-bold text-slate-800 mb-3">Real NASA Satellite Data</h3>
+            <p className="text-slate-600 leading-relaxed">
+              Hourly updates from the TEMPO satellite, not city-wide estimates. Your exact neighborhood, down to ±1km accuracy.
+            </p>
+          </div>
+
+          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-400 rounded-xl flex items-center justify-center mb-4">
+              <Zap className="text-white" size={24} />
+            </div>
+            <h3 className="text-xl font-bold text-slate-800 mb-3">AI Health Guidance</h3>
+            <p className="text-slate-600 leading-relaxed">
+              Google Gemini analyzes air quality and gives you personalized advice. Know when to wear a mask, when it's safe to exercise outside.
+            </p>
+          </div>
+
+          <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-6 border border-orange-100">
+            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-400 rounded-xl flex items-center justify-center mb-4">
+              <Globe className="text-white" size={24} />
+            </div>
+            <h3 className="text-xl font-bold text-slate-800 mb-3">24-Hour Forecasts</h3>
+            <p className="text-slate-600 leading-relaxed">
+              Plan your day with predictive forecasts. Plus wildfire alerts with exact GPS coordinates when fires are nearby.
+            </p>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Mission Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
         {mission.map((item, index) => {
@@ -107,7 +150,7 @@ const About = () => {
               key={item.title}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 + index * 0.1 }}
+              transition={{ delay: 0.7 + index * 0.1 }}
               className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow"
             >
               <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center mb-4">
@@ -128,7 +171,7 @@ const About = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8 }}
+        transition={{ delay: 1.0 }}
         className="mb-16"
       >
         <h2 className="text-3xl font-bold text-slate-800 text-center mb-8">
@@ -150,7 +193,7 @@ const About = () => {
                 key={feature.title}
                 initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.9 + index * 0.1 }}
+                transition={{ delay: 1.1 + index * 0.1 }}
                 className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
               >
                 <div className="flex items-start space-x-4">
@@ -176,7 +219,7 @@ const About = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.2 }}
+        transition={{ delay: 1.5 }}
         className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-2xl p-12 text-white mb-16"
       >
         <h2 className="text-3xl font-bold mb-6">The Story Behind ClearSkies</h2>
@@ -208,7 +251,7 @@ const About = () => {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 1.4 }}
+        transition={{ delay: 1.7 }}
         className="bg-white rounded-xl shadow-lg p-8 text-center"
       >
         <Award className="mx-auto mb-4 text-blue-600" size={48} />
@@ -240,7 +283,7 @@ const About = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.6 }}
+        transition={{ delay: 1.9 }}
         className="mt-16 text-center"
       >
         <p className="text-slate-600 text-lg mb-4">
