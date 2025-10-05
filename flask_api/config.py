@@ -31,7 +31,8 @@ class Config:
 
     # External API Endpoints
     OPENAQ_API = "https://api.openaq.org/v3"
-    OPENAQ_API_KEY = "d754ea7eb02cad29d60b6fb7af706864a8b38847b54fe722d4d1a23d13bf4318"
+    # Get your own free OpenAQ key at: https://explore.openaq.org/
+    OPENAQ_API_KEY = os.getenv("OPENAQ_API_KEY", "")  # Add your key to .env file
     NOAA_WEATHER_API = "https://api.weather.gov"
 
     # Default Coordinates (New York City)

@@ -9,10 +9,13 @@ and actionable insights for air quality data.
 import google.generativeai as genai
 from typing import Dict, Optional, Any
 import logging
+import os
 
 # Configure Gemini API
-GEMINI_API_KEY = "AIzaSyBaSA-1bFG_4rxW3eh3O9Mteq6w6Xz4sqs"
-genai.configure(api_key=GEMINI_API_KEY)
+# Get your own free API key at: https://ai.google.dev/
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")  # Add your key to .env file
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
 
 # Initialize the model (using gemini-2.5-flash for better availability)
 model = genai.GenerativeModel('gemini-2.5-flash')

@@ -188,7 +188,8 @@ class WAQIService:
     """
 
     # WAQI API token - Real-time global AQI data (same as Apple Maps, Google Weather)
-    WAQI_API_TOKEN = "43cfcad37b4ae4cd7e2264e319cb9c256bef7e7b"
+    # Get your own free token at: https://aqicn.org/data-platform/token/
+    WAQI_API_TOKEN = os.getenv("WAQI_API_TOKEN", "demo")  # Replace "demo" with your token
     WAQI_API_BASE = "https://api.waqi.info"
 
     @staticmethod
