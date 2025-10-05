@@ -526,6 +526,169 @@ class NOAAWeatherService:
             return None
 
 
+class FIRMSService:
+    """
+    NASA FIRMS (Fire Information for Resource Management System) -
+    Real-time wildfire detection from space.
+
+    FIRMS provides active fire data from multiple NASA satellites (MODIS and VIIRS)
+    that detect thermal anomalies indicating wildfires, with exact GPS coordinates.
+    Data is updated every 3 hours with detections from the last 24 hours.
+
+    Learn more: https://firms.modaps.eosdis.nasa.gov/
+    """
+
+    FIRMS_API_BASE = "https://firms.modaps.eosdis.nasa.gov/api/area/csv"
+    FIRMS_MAP_KEY = os.getenv("FIRMS_MAP_KEY", "")
+
+    @staticmethod
+    def get_nearby_wildfires(lat: float, lon: float, radius_km: int = 100, days: int = 1) -> Dict[str, Any]:
+        """
+        Get active wildfire detections near a location.
+
+        FIRMS uses NASA's MODIS and VIIRS satellites to detect thermal anomalies
+        that indicate active fires. Each detection includes:
+        - Exact GPS coordinates (latitude/longitude)
+        - Fire Radiative Power (FRP) - measures fire intensity
+        - Brightness temperature in Kelvin
+        - Detection confidence level
+        - Satellite source (MODIS/VIIRS)
+
+        Args:
+            lat: Center latitude
+            lon: Center longitude
+            radius_km: Search radius in kilometers (max 1000km)
+            days: Number of days to look back (1-10)
+
+        Returns:
+            Dictionary with wildfire detections and statistics
+        """
+        if not FIRMSService.FIRMS_MAP_KEY:
+            print("FIRMS API Key not configured")
+            return None
+
+        try:
+            # FIRMS API uses VIIRS for high-resolution (375m) fire detection
+            source = "VIIRS_NOAA20_NRT"  # Near Real-Time VIIRS data
+
+            # Build URL: https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/{source}/{radius}/{lat},{lon}/{days}
+            url = f"{FIRMSService.FIRMS_API_BASE}/{FIRMSService.FIRMS_MAP_KEY}/{source}/{radius_km}/{lat},{lon}/{days}"
+
+            response = requests.get(url, timeout=15)
+
+            if response.status_code != 200:
+                print(f"FIRMS API error: {response.status_code}")
+                return None
+
+            # Parse CSV response
+            lines = response.text.strip().split('\n')
+
+            if len(lines) < 2:  # No detections (only header)
+                return {
+                    'total_fires': 0,
+                    'fires': [],
+                    'statistics': {
+                        'max_brightness': 0,
+                        'max_frp': 0,
+                        'avg_confidence': 0
+                    },
+                    'radius_km': radius_km,
+                    'days_back': days,
+                    'source': 'NASA FIRMS - VIIRS Satellite',
+                    'info_url': 'https://firms.modaps.eosdis.nasa.gov/map/'
+                }
+
+            # Parse header
+            header = lines[0].split(',')
+
+            # Parse fire detections
+            fires = []
+            total_brightness = 0
+            total_frp = 0
+            total_confidence = 0
+            max_brightness = 0
+            max_frp = 0
+
+            for line in lines[1:]:
+                values = line.split(',')
+                if len(values) < len(header):
+                    continue
+
+                fire_data = dict(zip(header, values))
+
+                # Extract key fields
+                fire_lat = float(fire_data.get('latitude', 0))
+                fire_lon = float(fire_data.get('longitude', 0))
+                brightness = float(fire_data.get('bright_ti4', 0))  # Brightness temperature (Kelvin)
+                frp = float(fire_data.get('frp', 0))  # Fire Radiative Power (MW)
+                confidence = fire_data.get('confidence', 'nominal')  # low/nominal/high
+                acq_date = fire_data.get('acq_date', '')
+                acq_time = fire_data.get('acq_time', '')
+
+                # Calculate distance from center point
+                from math import radians, cos, sin, asin, sqrt
+
+                def haversine(lat1, lon1, lat2, lon2):
+                    """Calculate distance between two points in km"""
+                    R = 6371  # Earth radius in km
+                    dlat = radians(lat2 - lat1)
+                    dlon = radians(lon2 - lon1)
+                    a = sin(dlat/2)**2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon/2)**2
+                    c = 2 * asin(sqrt(a))
+                    return R * c
+
+                distance_km = haversine(lat, lon, fire_lat, fire_lon)
+
+                fire = {
+                    'latitude': fire_lat,
+                    'longitude': fire_lon,
+                    'brightness_kelvin': brightness,
+                    'frp_mw': frp,  # Fire Radiative Power in Megawatts
+                    'confidence': confidence,
+                    'distance_km': round(distance_km, 2),
+                    'detected_date': acq_date,
+                    'detected_time': acq_time,
+                    'satellite': fire_data.get('satellite', 'VIIRS')
+                }
+
+                fires.append(fire)
+
+                # Update statistics
+                total_brightness += brightness
+                total_frp += frp
+                max_brightness = max(max_brightness, brightness)
+                max_frp = max(max_frp, frp)
+
+                # Convert confidence to numeric for averaging
+                confidence_map = {'low': 1, 'nominal': 2, 'high': 3}
+                total_confidence += confidence_map.get(confidence.lower(), 2)
+
+            # Sort by distance (closest first)
+            fires.sort(key=lambda x: x['distance_km'])
+
+            num_fires = len(fires)
+
+            return {
+                'total_fires': num_fires,
+                'fires': fires[:50],  # Limit to 50 closest fires
+                'statistics': {
+                    'max_brightness_kelvin': round(max_brightness, 2),
+                    'max_frp_mw': round(max_frp, 2),
+                    'avg_confidence': round(total_confidence / num_fires, 2) if num_fires > 0 else 0,
+                    'total_frp_mw': round(total_frp, 2)  # Total fire power
+                },
+                'radius_km': radius_km,
+                'days_back': days,
+                'source': 'NASA FIRMS - VIIRS NOAA-20 Satellite',
+                'info_url': 'https://firms.modaps.eosdis.nasa.gov/map/',
+                'description': 'FIRMS uses NASA satellites to detect thermal anomalies indicating active fires, updated every 3 hours'
+            }
+
+        except Exception as e:
+            print(f"FIRMS API Error: {str(e)}")
+            return None
+
+
 # ═══════════════════════════════════════════════════════════════════════════
 # Unified Forecast Service - The Masterpiece
 # ═══════════════════════════════════════════════════════════════════════════

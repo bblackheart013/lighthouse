@@ -24,7 +24,7 @@ const About = () => {
     {
       icon: Flame,
       title: 'NASA FIRMS Wildfire Data',
-      description: 'Real-time wildfire detection with exact GPS coordinates, helping you stay safe during fire season.',
+      description: 'Real-time wildfire detection from MODIS and VIIRS satellites with exact GPS coordinates, updated every 3 hours. Track active fires with precise locations.',
       color: 'orange'
     },
     {
@@ -226,6 +226,164 @@ const About = () => {
               </motion.div>
             )
           })}
+        </div>
+      </motion.div>
+
+      {/* How FIRMS Works Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.3 }}
+        className="mb-16"
+      >
+        <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl shadow-xl p-10 border-2 border-orange-200">
+          <div className="flex items-center justify-center mb-6">
+            <div className="p-4 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl shadow-lg">
+              <Flame className="text-white" size={48} />
+            </div>
+          </div>
+
+          <h2 className="text-3xl font-bold text-center text-slate-800 mb-6">
+            How NASA FIRMS Detects Wildfires
+          </h2>
+
+          <p className="text-center text-slate-700 mb-8 max-w-3xl mx-auto text-lg">
+            FIRMS (Fire Information for Resource Management System) uses NASA satellites to detect active wildfires in near real-time, providing exact GPS coordinates and fire intensity data.
+          </p>
+
+          {/* FIRMS Process Breakdown */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="bg-white rounded-xl p-6 shadow-md">
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+                <span className="text-2xl font-bold text-orange-600">1</span>
+              </div>
+              <h4 className="font-bold text-slate-800 mb-2">Satellite Detection</h4>
+              <p className="text-sm text-slate-600">
+                NASA satellites (MODIS & VIIRS) scan Earth using infrared sensors to detect thermal anomalies indicating fires
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-md">
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+                <span className="text-2xl font-bold text-orange-600">2</span>
+              </div>
+              <h4 className="font-bold text-slate-800 mb-2">Algorithm Processing</h4>
+              <p className="text-sm text-slate-600">
+                Advanced algorithms analyze brightness temperature and distinguish real fires from other heat sources like industrial activity
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-md">
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+                <span className="text-2xl font-bold text-orange-600">3</span>
+              </div>
+              <h4 className="font-bold text-slate-800 mb-2">Data Validation</h4>
+              <p className="text-sm text-slate-600">
+                Each detection includes exact GPS coordinates, Fire Radiative Power (FRP), brightness temperature, and confidence level
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-md">
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+                <span className="text-2xl font-bold text-orange-600">4</span>
+              </div>
+              <h4 className="font-bold text-slate-800 mb-2">Real-Time Delivery</h4>
+              <p className="text-sm text-slate-600">
+                Fire data is processed and available within 3 hours of detection, accessible through the FIRMS API for emergency response
+              </p>
+            </div>
+          </div>
+
+          {/* Satellite Specifications */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div className="bg-white rounded-xl p-6 shadow-md border-2 border-orange-200">
+              <h4 className="font-bold text-slate-800 mb-3 flex items-center">
+                <Satellite className="mr-2 text-orange-600" size={24} />
+                VIIRS (Visible Infrared Imaging Radiometer)
+              </h4>
+              <ul className="space-y-2 text-sm text-slate-700">
+                <li className="flex items-start">
+                  <span className="text-orange-500 mr-2">•</span>
+                  <span><strong>Resolution:</strong> 375 meters - highest fire detection accuracy</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-orange-500 mr-2">•</span>
+                  <span><strong>Satellites:</strong> NOAA-20, Suomi NPP</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-orange-500 mr-2">•</span>
+                  <span><strong>Coverage:</strong> Global, twice daily</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-orange-500 mr-2">•</span>
+                  <span><strong>Advantage:</strong> Detects smaller fires missed by MODIS</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-md border-2 border-red-200">
+              <h4 className="font-bold text-slate-800 mb-3 flex items-center">
+                <Satellite className="mr-2 text-red-600" size={24} />
+                MODIS (Moderate Resolution Imaging Spectroradiometer)
+              </h4>
+              <ul className="space-y-2 text-sm text-slate-700">
+                <li className="flex items-start">
+                  <span className="text-red-500 mr-2">•</span>
+                  <span><strong>Resolution:</strong> 1 kilometer - broad area coverage</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-red-500 mr-2">•</span>
+                  <span><strong>Satellites:</strong> Terra, Aqua</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-red-500 mr-2">•</span>
+                  <span><strong>Coverage:</strong> Global, four times daily</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-red-500 mr-2">•</span>
+                  <span><strong>Advantage:</strong> Long operational history since 2000</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Key Features */}
+          <div className="bg-white rounded-xl p-6 shadow-md mb-6">
+            <h4 className="font-bold text-slate-800 mb-4 text-center">What Makes FIRMS Reliable</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div className="text-center">
+                <p className="font-bold text-orange-600 text-2xl mb-1">3 Hours</p>
+                <p className="text-slate-600">Near real-time data updates</p>
+              </div>
+              <div className="text-center">
+                <p className="font-bold text-orange-600 text-2xl mb-1">24/7</p>
+                <p className="text-slate-600">Continuous global monitoring</p>
+              </div>
+              <div className="text-center">
+                <p className="font-bold text-orange-600 text-2xl mb-1">±375m</p>
+                <p className="text-slate-600">Precise fire location accuracy</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Official Source Link */}
+          <div className="text-center">
+            <p className="text-slate-700 mb-3">
+              Lighthouse uses official NASA FIRMS data to provide you with the most accurate wildfire information.
+            </p>
+            <a
+              href="https://firms.modaps.eosdis.nasa.gov/map/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105"
+            >
+              <Flame className="mr-2" size={20} />
+              View NASA FIRMS Global Fire Map
+            </a>
+            <p className="text-xs text-slate-500 mt-2">
+              Official Source: firms.modaps.eosdis.nasa.gov/map/
+            </p>
+          </div>
         </div>
       </motion.div>
 

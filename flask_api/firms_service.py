@@ -7,6 +7,21 @@ NASA FIRMS Wildfire Service
 This module integrates NASA FIRMS (Fire Information for Resource Management System)
 to detect and track active wildfires using satellite data.
 
+Learn more: https://firms.modaps.eosdis.nasa.gov/map/
+
+FIRMS provides real-time active fire data from NASA's MODIS and VIIRS satellites:
+- VIIRS (Visible Infrared Imaging Radiometer Suite) - 375m resolution
+- MODIS (Moderate Resolution Imaging Spectroradiometer) - 1km resolution
+- Near real-time detection (updated every 3 hours)
+- Global coverage with exact GPS coordinates
+
+How FIRMS Works:
+━━━━━━━━━━━━━━━━
+1. SATELLITE DETECTION: NASA satellites detect thermal anomalies using infrared sensors
+2. ALGORITHM PROCESSING: Advanced algorithms distinguish fires from other heat sources
+3. DATA VALIDATION: Each detection includes brightness, confidence, and precise location
+4. REAL-TIME DELIVERY: Data is processed and made available within 3 hours
+
 Data source: NASA FIRMS API
 - MODIS and VIIRS satellite instruments
 - Near real-time fire detection (within 3 hours)
@@ -16,6 +31,7 @@ Data source: NASA FIRMS API
 """
 
 import requests
+import os
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 import math
@@ -27,14 +43,23 @@ class FirmsService:
     NASA FIRMS - Eyes in the sky watching for fires.
 
     Detects active wildfires using thermal anomalies from satellite sensors.
+
+    FIRMS uses NASA's MODIS and VIIRS satellites to detect thermal anomalies
+    that indicate active fires. Each detection includes:
+    - Exact GPS coordinates (latitude/longitude)
+    - Fire Radiative Power (FRP) - measures fire intensity
+    - Brightness temperature in Kelvin
+    - Detection confidence level
+    - Satellite source (MODIS/VIIRS)
     """
 
     # NASA FIRMS API endpoint (CSV format for simplicity)
-    # Note: In production, you would need to register for a MAP_KEY at https://firms.modaps.eosdis.nasa.gov/api/
+    # Official docs: https://firms.modaps.eosdis.nasa.gov/api/
     FIRMS_API = "https://firms.modaps.eosdis.nasa.gov/api/area/csv"
 
-    # Mock API key placeholder - replace with real key for production
-    MAP_KEY = "DEMO_MAP_KEY"
+    # Get FIRMS MAP KEY from environment variable
+    # Get your free key at: https://firms.modaps.eosdis.nasa.gov/api/
+    MAP_KEY = os.getenv("FIRMS_MAP_KEY", "DEMO_MAP_KEY")
 
     @staticmethod
     def _calculate_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -89,6 +114,8 @@ class FirmsService:
         """
         Fetch active wildfire data from NASA FIRMS.
 
+        FIRMS API Format: /api/area/csv/{MAP_KEY}/{source}/{radius}/{lat},{lon}/{day_range}
+
         Args:
             lat: Latitude of query point
             lon: Longitude of query point
@@ -98,29 +125,32 @@ class FirmsService:
             Dictionary containing wildfire data and statistics
         """
         try:
-            # Note: Real FIRMS API requires authentication
-            # Format: /api/area/csv/{MAP_KEY}/{source}/{area}/{day_range}
-            # For demo purposes, we'll use mock data if API fails
-
-            # Construct API URL
-            source = 'VIIRS_SNPP_NRT'  # VIIRS sensor on Suomi NPP satellite
+            # Use VIIRS_NOAA20_NRT for highest resolution (375m) fire detection
+            # VIIRS NOAA-20 provides better fire detection than MODIS (1km resolution)
+            source = 'VIIRS_NOAA20_NRT'  # Near Real-Time VIIRS data from NOAA-20 satellite
             day_range = 1  # Last 24 hours
 
-            # FIRMS uses bounding box, but we'll approximate with lat/lon + radius
-            # For simplicity, converting radius to approximate degrees (very rough)
-            degree_offset = radius_km / 111.0  # ~111km per degree latitude
+            # Construct FIRMS API URL
+            # Format: https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/{source}/{radius}/{lat},{lon}/{day_range}
+            url = f"{FirmsService.FIRMS_API}/{FirmsService.MAP_KEY}/{source}/{radius_km}/{lat},{lon}/{day_range}"
 
-            url = f"{FirmsService.FIRMS_API}/{FirmsService.MAP_KEY}/{source}/{lat},{lon},{degree_offset}/{day_range}"
+            print(f"FIRMS API Request: {url.replace(FirmsService.MAP_KEY, '***KEY***')}")  # Log without exposing key
 
             # Make request with timeout
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, timeout=15)
 
-            # If demo key fails, return mock data for demonstration
-            if response.status_code != 200 or FirmsService.MAP_KEY == "DEMO_MAP_KEY":
+            # Check if we have a valid API key and successful response
+            if response.status_code != 200:
+                print(f"FIRMS API returned status code: {response.status_code}")
+                if FirmsService.MAP_KEY == "DEMO_MAP_KEY":
+                    print("Using mock data - Configure FIRMS_MAP_KEY environment variable for real data")
                 return FirmsService._get_mock_wildfire_data(lat, lon, radius_km)
 
             # Parse CSV response
             fires = FirmsService._parse_firms_csv(response.text, lat, lon, radius_km)
+
+            # Add success note
+            fires['note'] = 'Real-time FIRMS data from NASA VIIRS NOAA-20 satellite'
 
             return fires
 
