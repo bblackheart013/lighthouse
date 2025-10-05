@@ -146,16 +146,28 @@ const Compare = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className={`bg-${getTrendColor(trend_24h)}-50 border border-${getTrendColor(trend_24h)}-200 rounded-2xl p-8 mb-8 shadow-lg`}
+          className={`rounded-2xl p-8 mb-8 shadow-lg ${
+            trend_24h === 'improving' ? 'bg-green-50 border border-green-200' :
+            trend_24h === 'deteriorating' ? 'bg-red-50 border border-red-200' :
+            'bg-gray-50 border border-gray-200'
+          }`}
         >
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               {getTrendIcon(trend_24h)}
               <div>
-                <h2 className={`text-2xl font-bold text-${getTrendColor(trend_24h)}-800`}>
+                <h2 className={`text-2xl font-bold ${
+                  trend_24h === 'improving' ? 'text-green-800' :
+                  trend_24h === 'deteriorating' ? 'text-red-800' :
+                  'text-gray-800'
+                }`}>
                   {getTrendLabel(trend_24h)}
                 </h2>
-                <p className={`text-${getTrendColor(trend_24h)}-600 mt-1`}>
+                <p className={`mt-1 ${
+                  trend_24h === 'improving' ? 'text-green-700' :
+                  trend_24h === 'deteriorating' ? 'text-red-700' :
+                  'text-gray-700'
+                }`}>
                   24-hour trend from satellite measurements
                 </p>
               </div>
@@ -163,10 +175,14 @@ const Compare = () => {
 
             {change_24h && (
               <div className="text-center">
-                <div className={`text-5xl font-black text-${getTrendColor(trend_24h)}-700`}>
+                <div className={`text-5xl font-black ${
+                  trend_24h === 'improving' ? 'text-green-700' :
+                  trend_24h === 'deteriorating' ? 'text-red-700' :
+                  'text-gray-700'
+                }`}>
                   {change_24h > 0 ? '+' : ''}{Math.round(change_24h)}
                 </div>
-                <div className="text-sm text-gray-600 mt-1">AQI change (24h)</div>
+                <div className="text-sm text-gray-700 mt-1">AQI change (24h)</div>
               </div>
             )}
           </div>
@@ -246,10 +262,14 @@ const Compare = () => {
 
                 {change_24h && (
                   <div className="bg-gray-50 rounded-lg p-3 text-center">
-                    <div className={`text-2xl font-bold text-${getTrendColor(trend_24h)}-600`}>
+                    <div className={`text-2xl font-bold ${
+                      trend_24h === 'improving' ? 'text-green-600' :
+                      trend_24h === 'deteriorating' ? 'text-red-600' :
+                      'text-gray-600'
+                    }`}>
                       {change_24h > 0 ? '+' : ''}{Math.round(change_24h)} AQI
                     </div>
-                    <div className="text-xs text-gray-600 mt-1">24h change</div>
+                    <div className="text-xs text-gray-700 mt-1">24h change</div>
                   </div>
                 )}
               </div>
@@ -287,10 +307,14 @@ const Compare = () => {
 
                 {change_7d && (
                   <div className="bg-gray-50 rounded-lg p-3 text-center">
-                    <div className={`text-2xl font-bold text-${getTrendColor(trend_7d)}-600`}>
+                    <div className={`text-2xl font-bold ${
+                      trend_7d === 'improving' ? 'text-green-600' :
+                      trend_7d === 'deteriorating' ? 'text-red-600' :
+                      'text-gray-600'
+                    }`}>
                       {change_7d > 0 ? '+' : ''}{Math.round(change_7d)} AQI
                     </div>
-                    <div className="text-xs text-gray-600 mt-1">7-day change</div>
+                    <div className="text-xs text-gray-700 mt-1">7-day change</div>
                   </div>
                 )}
               </div>
