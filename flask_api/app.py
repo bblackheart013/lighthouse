@@ -211,7 +211,14 @@ def create_app() -> Flask:
     # Enable CORS for frontend integration
     CORS(app, resources={
         r"/*": {
-            "origins": ["http://localhost:3000", "http://localhost:5173", "http://localhost:5174", "http://localhost:5175"],
+            "origins": [
+                "http://localhost:3000",
+                "http://localhost:5173",
+                "http://localhost:5174",
+                "http://localhost:5175",
+                "https://lighthouse-cadel3aal-bblackheart013s-projects.vercel.app",
+                "https://*.vercel.app"
+            ],
             "methods": ["GET", "POST", "OPTIONS"],
             "allow_headers": ["Content-Type"]
         }
