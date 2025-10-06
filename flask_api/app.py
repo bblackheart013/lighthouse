@@ -430,18 +430,25 @@ def register_routes(app: Flask) -> None:
         Query Parameters:
             lat (float): Latitude
             lon (float): Longitude
+            date (str, optional): Target date in YYYY-MM-DD format (for forecasts up to 16 days)
 
         Returns:
             Complete weather intelligence including:
-            - Current conditions
+            - Current conditions or forecast for specified date
             - 24h rain forecast
             - Umbrella recommendation
             - Clothing suggestions
             - Moon phase
         """
-        logger.data(f"Weather intelligence request: ({lat:.4f}, {lon:.4f})")
+        # Get optional date parameter
+        target_date = request.args.get('date')
 
-        result = WeatherService.get_comprehensive_weather(lat, lon)
+        if target_date:
+            logger.data(f"Weather forecast request for {target_date}: ({lat:.4f}, {lon:.4f})")
+            result = WeatherService.get_forecast_for_date(lat, lon, target_date)
+        else:
+            logger.data(f"Weather intelligence request: ({lat:.4f}, {lon:.4f})")
+            result = WeatherService.get_comprehensive_weather(lat, lon)
 
         if not result:
             logger.warning("Weather data unavailable")
@@ -987,10 +994,14 @@ def register_routes(app: Flask) -> None:
     @validate_coordinates
     def alerts(lat: float, lon: float):
         """
-        ⚠️ Proactive Air Quality Alerts
+        ⚠️ Comprehensive Personalized Air Quality Alerts
 
-        Generates dynamic alerts when AQI exceeds safe thresholds.
-        Returns actionable health guidance with cause analysis.
+        Generates intelligent, multi-faceted alerts using:
+        - Gemini AI for personalized health guidance
+        - Wildfire detection (NASA FIRMS)
+        - Weather alerts (extreme conditions, umbrella)
+        - AQI threshold monitoring
+        - Air quality trend analysis
 
         Query Parameters:
             lat (float): Latitude
@@ -998,60 +1009,315 @@ def register_routes(app: Flask) -> None:
             threshold (int): Alert threshold AQI (default: 100)
 
         Returns:
-            Alert status with health guidance and trend analysis
+            Comprehensive alert data with AI-powered insights
         """
-        from services import OpenAQService, NOAAWeatherService
+        from services import OpenAQService, NOAAWeatherService, WAQIService
+        from firms_service import FirmsService
+        from datetime import datetime, timedelta
 
         threshold = request.args.get('threshold', 100, type=int)
         city = request.args.get('city', None)
 
-        logger.data(f"Alert check: ({lat:.4f}, {lon:.4f}) [threshold: {threshold}]")
+        logger.data(f"🔔 Comprehensive alert check: ({lat:.4f}, {lon:.4f}) [threshold: {threshold}]")
 
-        # Get current forecast
-        prediction = TEMPOPredictor.generate_forecast(lat, lon, city)
+        # Gather all data sources for comprehensive analysis
+        try:
+            # Get REAL-TIME AQI from WAQI (primary source - same as forecast endpoint)
+            waqi_data = WAQIService.get_real_time_aqi(lat, lon)
 
-        if not prediction.get('predicted_aqi'):
+            if not waqi_data or not waqi_data.get('aqi'):
+                return jsonify({
+                    'alert_active': False,
+                    'message': 'No AQI data available for this location',
+                    'location': {'lat': lat, 'lon': lon}
+                })
+
+            # Extract AQI early as we need it for other calls
+            aqi = waqi_data['aqi']
+            category = WAQIService._get_aqi_category(aqi)
+
+            # Try to get TEMPO satellite prediction for additional context
+            try:
+                prediction = TEMPOPredictor.generate_forecast(lat, lon, city)
+            except:
+                prediction = {}
+
+            # Get current conditions
+            weather = NOAAWeatherService.get_conditions(lat, lon)
+
+            # Get wildfires
+            try:
+                wildfires = FirmsService.get_active_fires(lat, lon, 100)
+            except:
+                wildfires = {'count': 0, 'wildfire_detected': False, 'closest_fire': None}
+
+            # Get pollutant data
+            try:
+                ground_data = OpenAQService.get_pollutants(lat, lon)
+            except:
+                ground_data = {'data': {}}
+
+            # Calculate breath score with proper parameters
+            try:
+                breath = BreathScoreService.calculate_breath_score(
+                    aqi=aqi,
+                    pollutants=ground_data.get('data') if ground_data else {},
+                    wildfires_detected=wildfires.get('count', 0) > 0,
+                    wildfire_distance=wildfires.get('closest_fire', {}).get('distance_km') if wildfires.get('closest_fire') else None,
+                    humidity=weather.get('humidity', 50) if weather else 50,
+                    temperature=weather.get('temp', 70) if weather else 70
+                )
+            except Exception as e:
+                logger.error(f"Breath score calculation failed: {str(e)}")
+                breath = {'score': None}
+
+            # Get location name
+            try:
+                location_info = GeocodingService.reverse_geocode(lat, lon)
+                location_name = location_info.get('city') or location_info.get('display_name') or f"{lat:.2f}°, {lon:.2f}°"
+            except:
+                location_name = city or f"{lat:.2f}°, {lon:.2f}°"
+
+        except Exception as e:
+            logger.error(f"Error gathering alert data: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return jsonify({
-                'alert_active': False,
-                'message': 'Insufficient data for alert generation',
+                'error': 'Failed to generate comprehensive alerts',
+                'message': str(e),
                 'location': {'lat': lat, 'lon': lon}
+            }), 500
+
+        # Initialize alerts array
+        alerts = []
+        alert_count = 0
+
+        # ═══════════════════════════════════════════════════════════════════
+        # 1. AI-POWERED PERSONALIZED ALERT (if AQI is concerning)
+        # ═══════════════════════════════════════════════════════════════════
+        if aqi > 50:  # Generate AI insights for any non-perfect air quality
+            try:
+                ai_insights = GeminiInsightsGenerator.get_insights(
+                    lat=lat,
+                    lon=lon,
+                    aqi=aqi,
+                    pollutants=ground_data.get('data') if ground_data else None,
+                    location_name=location_name,
+                    weather=weather,
+                    breath_score=breath.get('score') if breath else None
+                )
+
+                if ai_insights.get('success'):
+                    insights = ai_insights['insights']
+                    severity = 'critical' if aqi > 200 else 'high' if aqi > 150 else 'moderate' if aqi > 100 else 'low'
+
+                    alerts.append({
+                        'id': 'ai_personalized',
+                        'type': 'ai_health',
+                        'severity': severity,
+                        'title': f"🧠 Personalized Health Guidance for {location_name}",
+                        'summary': insights.get('summary', ''),
+                        'message': insights.get('summary', ''),
+                        'health_recommendations': insights.get('health_recommendations', []),
+                        'contextual_insights': insights.get('contextual_insights', []),
+                        'actionable_tips': insights.get('actionable_tips', []),
+                        'ai_powered': True,
+                        'ai_model': 'Google Gemini 2.5 Flash',
+                        'full_response': insights.get('full_response', ''),
+                        'timestamp': datetime.utcnow().isoformat() + 'Z'
+                    })
+                    alert_count += 1
+                else:
+                    # Use fallback if AI fails
+                    fallback = ai_insights.get('fallback_insights', {})
+                    if fallback:
+                        alerts.append({
+                            'id': 'health_guidance',
+                            'type': 'health',
+                            'severity': 'moderate' if aqi > 100 else 'low',
+                            'title': f"Health Guidance - AQI {aqi}",
+                            'summary': fallback.get('summary', ''),
+                            'health_recommendations': fallback.get('health_recommendations', []),
+                            'actionable_tips': fallback.get('actionable_tips', []),
+                            'ai_powered': False,
+                            'timestamp': datetime.utcnow().isoformat() + 'Z'
+                        })
+                        alert_count += 1
+            except Exception as e:
+                logger.error(f"AI insights generation failed: {str(e)}")
+                # Continue with other alerts even if AI fails
+
+        # ═══════════════════════════════════════════════════════════════════
+        # 2. AQI THRESHOLD ALERT (Traditional)
+        # ═══════════════════════════════════════════════════════════════════
+        if aqi > threshold:
+            severity = 'critical' if aqi > 200 else 'high' if aqi > 150 else 'moderate'
+
+            alerts.append({
+                'id': 'aqi_threshold',
+                'type': 'air_quality',
+                'severity': severity,
+                'title': f"🚨 Air Quality Alert: {category}",
+                'message': f"Current AQI of {aqi} exceeds safety threshold of {threshold}",
+                'aqi': aqi,
+                'category': category,
+                'threshold': threshold,
+                'health_guidance': _get_health_advice(aqi),
+                'actions': _generate_alert_actions(aqi),
+                'affected_groups': ['General Public', 'Sensitive Groups'] if aqi > 150 else ['Sensitive Groups'],
+                'timestamp': datetime.utcnow().isoformat() + 'Z'
             })
+            alert_count += 1
 
-        aqi = prediction['predicted_aqi']
-        alert_active = aqi > threshold
+        # ═══════════════════════════════════════════════════════════════════
+        # 3. WILDFIRE ALERT
+        # ═══════════════════════════════════════════════════════════════════
+        if wildfires and wildfires.get('wildfire_detected'):
+            fire_count = wildfires.get('count', 0)
+            closest = wildfires.get('closest_fire')
 
-        # Build alert response
+            if closest:
+                distance = closest.get('distance_km', 0)
+                severity = 'critical' if distance < 25 else 'high' if distance < 50 else 'moderate'
+
+                alerts.append({
+                    'id': 'wildfire',
+                    'type': 'wildfire',
+                    'severity': severity,
+                    'title': f"🔥 Wildfire Alert - {fire_count} Active Fire{'s' if fire_count > 1 else ''}",
+                    'message': f"Active wildfire detected {distance:.1f}km away. Smoke may impact air quality.",
+                    'fire_count': fire_count,
+                    'closest_distance_km': distance,
+                    'brightness': closest.get('brightness'),
+                    'confidence': closest.get('confidence'),
+                    'actions': [
+                        "Monitor air quality closely - wildfire smoke contains harmful particles",
+                        "Keep windows and doors closed",
+                        "Use N95 masks if you must go outside",
+                        "Avoid outdoor activities, especially exercise",
+                        "Run air purifiers on high settings",
+                        "Have evacuation plan ready if fire approaches"
+                    ],
+                    'affected_groups': ['Everyone', 'Especially sensitive groups'],
+                    'source': 'NASA FIRMS (Fire Information for Resource Management System)',
+                    'timestamp': datetime.utcnow().isoformat() + 'Z'
+                })
+                alert_count += 1
+
+        # ═══════════════════════════════════════════════════════════════════
+        # 4. WEATHER ALERTS
+        # ═══════════════════════════════════════════════════════════════════
+        if weather:
+            # Umbrella alert
+            umbrella = weather.get('umbrella_needed')
+            if umbrella:
+                alerts.append({
+                    'id': 'umbrella',
+                    'type': 'weather',
+                    'severity': 'low',
+                    'title': "☔ Umbrella Recommended",
+                    'message': umbrella.get('message', 'Rain expected - bring an umbrella!'),
+                    'precipitation_chance': umbrella.get('precipitation_chance'),
+                    'actions': [
+                        "Bring an umbrella or rain jacket",
+                        "Plan for wet conditions if going outside"
+                    ],
+                    'timestamp': datetime.utcnow().isoformat() + 'Z'
+                })
+                alert_count += 1
+
+            # Extreme temperature alert
+            temp = weather.get('temp')
+            if temp:
+                if temp > 95:  # Fahrenheit
+                    alerts.append({
+                        'id': 'extreme_heat',
+                        'type': 'weather',
+                        'severity': 'high',
+                        'title': "🌡️ Extreme Heat Alert",
+                        'message': f"Temperature is {temp}°F - combined with air pollution, health risks increase significantly.",
+                        'temperature': temp,
+                        'actions': [
+                            "Stay indoors during peak heat hours (10am-4pm)",
+                            "Drink plenty of water - heat + pollution is dangerous",
+                            "Avoid strenuous outdoor activities",
+                            "Check on vulnerable neighbors and family",
+                            "Never leave children or pets in vehicles"
+                        ],
+                        'affected_groups': ['Everyone', 'Elderly', 'Children', 'Outdoor Workers'],
+                        'timestamp': datetime.utcnow().isoformat() + 'Z'
+                    })
+                    alert_count += 1
+                elif temp < 20:  # Very cold
+                    alerts.append({
+                        'id': 'extreme_cold',
+                        'type': 'weather',
+                        'severity': 'moderate',
+                        'title': "❄️ Cold Weather Advisory",
+                        'message': f"Temperature is {temp}°F - cold air can worsen respiratory symptoms.",
+                        'temperature': temp,
+                        'actions': [
+                            "Limit time outdoors in cold air",
+                            "Cover nose and mouth with scarf when outside",
+                            "Cold air can trigger asthma - be prepared",
+                            "Dress in warm layers"
+                        ],
+                        'affected_groups': ['People with asthma', 'Elderly', 'Children'],
+                        'timestamp': datetime.utcnow().isoformat() + 'Z'
+                    })
+                    alert_count += 1
+
+        # ═══════════════════════════════════════════════════════════════════
+        # 5. TREND ALERT (Rapid deterioration)
+        # ═══════════════════════════════════════════════════════════════════
+        # Check if AQI is rapidly increasing (would need historical comparison)
+        # For now, flag if AQI is elevated
+        if aqi > 100:
+            alerts.append({
+                'id': 'trend_deteriorating',
+                'type': 'trend',
+                'severity': 'moderate',
+                'title': "📈 Air Quality Trend Alert",
+                'message': "Air quality is elevated. Monitor conditions throughout the day.",
+                'current_aqi': aqi,
+                'trend': 'elevated',
+                'actions': [
+                    "Check AQI updates throughout the day",
+                    "Plan outdoor activities for times with better air quality",
+                    "Consider alternative indoor exercise options"
+                ],
+                'timestamp': datetime.utcnow().isoformat() + 'Z'
+            })
+            alert_count += 1
+
+        # ═══════════════════════════════════════════════════════════════════
+        # Build comprehensive response
+        # ═══════════════════════════════════════════════════════════════════
         result = {
-            'alert_active': alert_active,
-            'location': prediction['location'],
-            'current_aqi': aqi,
-            'threshold': threshold,
-            'category': prediction['category'],
+            'alert_active': alert_count > 0,
+            'alert_count': alert_count,
+            'alerts': alerts,
+            'location': {
+                'lat': round(lat, 4),
+                'lon': round(lon, 4),
+                'city': location_name
+            },
+            'summary': {
+                'aqi': aqi,
+                'category': category,
+                'breath_score': breath.get('score') if breath else None,
+                'breath_rating': breath.get('rating') if breath else None,
+                'wildfire_detected': wildfires.get('count', 0) > 0 if wildfires else False,
+                'weather_condition': weather.get('conditions') if weather else None,
+                'temperature': weather.get('temp') if weather else None
+            },
             'timestamp': datetime.utcnow().isoformat() + 'Z'
         }
 
-        if alert_active:
-            # Get weather for cause analysis
-            weather = NOAAWeatherService.get_conditions(lat, lon)
-
-            # Generate dynamic alert message
-            cause = "elevated nitrogen dioxide levels from vehicle emissions"
-            if weather and 'calm' in str(weather.get('wind_speed', '')).lower():
-                cause += " combined with stagnant atmospheric conditions"
-
-            result['alert'] = {
-                'severity': 'high' if aqi > 150 else 'moderate',
-                'headline': f"Air Quality Alert: {prediction['category']}",
-                'message': f"AQI is predicted to reach {aqi} tomorrow due to {cause}.",
-                'health_guidance': prediction['advice'],
-                'actions': _generate_alert_actions(aqi),
-                'forecast_trend': 'deteriorating' if aqi > 120 else 'elevated'
-            }
-
-            logger.warning(f"Alert triggered: AQI {aqi} at ({lat:.4f}, {lon:.4f})")
+        if alert_count > 0:
+            logger.warning(f"🔔 {alert_count} alert(s) active at ({lat:.4f}, {lon:.4f})")
         else:
-            result['message'] = f"Air quality is within safe limits (AQI: {aqi})"
-            logger.success(f"No alert: AQI {aqi} at ({lat:.4f}, {lon:.4f})")
+            logger.success(f"✓ No active alerts at ({lat:.4f}, {lon:.4f})")
 
         return jsonify(result)
 

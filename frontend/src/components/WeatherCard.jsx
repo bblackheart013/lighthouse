@@ -13,7 +13,7 @@
  */
 
 import React, { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   Cloud,
   CloudRain,
@@ -33,15 +33,73 @@ import {
   CloudDrizzle as Dew,
   CloudCog,
   Zap,
-  Snowflake
+  Snowflake,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  X
 } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts'
 
-const WeatherCard = ({ weatherData, aqi, loading }) => {
+const WeatherCard = ({ weatherData, aqi, loading, selectedDate: propSelectedDate, onDateChange }) => {
   // Temperature scale state (C, F, K) - persisted in localStorage
   const [tempScale, setTempScale] = useState(() => {
     return localStorage.getItem('tempScale') || 'C'
   })
+
+  // Use prop if provided, otherwise internal state
+  const [internalDate, setInternalDate] = useState(new Date())
+  const selectedDate = propSelectedDate || internalDate
+  const setSelectedDate = (newDate) => {
+    if (onDateChange) {
+      onDateChange(newDate)
+    } else {
+      setInternalDate(newDate)
+    }
+  }
+
+  const [showDatePicker, setShowDatePicker] = useState(false)
+  const [calendarMonth, setCalendarMonth] = useState(new Date())
+
+  // Generate next 16 days for date selection (Open-Meteo forecast limit)
+  const getNext16Days = () => {
+    const days = []
+    for (let i = 0; i < 16; i++) {
+      const date = new Date()
+      date.setDate(date.getDate() + i)
+      days.push(date)
+    }
+    return days
+  }
+
+  // Month navigation
+  const nextMonth = () => {
+    const newMonth = new Date(calendarMonth)
+    newMonth.setMonth(newMonth.getMonth() + 1)
+    setCalendarMonth(newMonth)
+  }
+
+  const prevMonth = () => {
+    const newMonth = new Date(calendarMonth)
+    newMonth.setMonth(newMonth.getMonth() - 1)
+    // Don't go before current month
+    if (newMonth >= new Date(new Date().getFullYear(), new Date().getMonth(), 1)) {
+      setCalendarMonth(newMonth)
+    }
+  }
+
+  const formatDate = (date) => {
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  }
+
+  const formatFullDate = (date) => {
+    return date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+  }
+
+  const isToday = (date) => {
+    const today = new Date()
+    return date.toDateString() === today.toDateString()
+  }
 
   // Update localStorage when scale changes
   useEffect(() => {
@@ -257,6 +315,186 @@ const WeatherCard = ({ weatherData, aqi, loading }) => {
         </div>
       </div>
 
+      {/* Date Selector with Horizontal Scroll & Calendar */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="mb-6 p-4 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg"
+      >
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <Calendar className="text-blue-600" size={20} />
+            <h3 className="text-lg font-bold text-gray-800">Select Forecast Date</h3>
+            <span className="text-sm text-gray-500">({formatFullDate(selectedDate)})</span>
+          </div>
+
+          {/* Calendar Toggle Button */}
+          <button
+            onClick={() => setShowDatePicker(!showDatePicker)}
+            className="p-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-all hover:scale-110"
+            title="Open calendar"
+          >
+            <Calendar size={20} />
+          </button>
+        </div>
+
+        {/* Calendar Popup */}
+        <AnimatePresence>
+          {showDatePicker && (
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              className="mb-4 p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl border border-blue-200 shadow-lg"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={prevMonth}
+                    className="p-1 hover:bg-blue-100 rounded-lg transition-colors"
+                    title="Previous month"
+                  >
+                    <ChevronLeft size={20} className="text-gray-600" />
+                  </button>
+                  <h4 className="font-bold text-gray-800 min-w-[140px] text-center">
+                    {calendarMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                  </h4>
+                  <button
+                    onClick={nextMonth}
+                    className="p-1 hover:bg-blue-100 rounded-lg transition-colors"
+                    title="Next month"
+                  >
+                    <ChevronRight size={20} className="text-gray-600" />
+                  </button>
+                </div>
+                <button
+                  onClick={() => setShowDatePicker(false)}
+                  className="p-1 hover:bg-blue-100 rounded-lg transition-colors"
+                >
+                  <X size={16} className="text-gray-600" />
+                </button>
+              </div>
+
+              {/* Calendar Grid */}
+              <div className="grid grid-cols-7 gap-2">
+                {/* Day headers */}
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                  <div key={day} className="text-center text-xs font-semibold text-gray-500 pb-1">
+                    {day}
+                  </div>
+                ))}
+
+                {/* Calendar dates */}
+                {(() => {
+                  const today = new Date()
+                  today.setHours(0, 0, 0, 0)
+
+                  const firstDay = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), 1)
+                  const lastDay = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 0)
+                  const startPadding = firstDay.getDay()
+                  const dates = []
+
+                  // Add padding for first week
+                  for (let i = 0; i < startPadding; i++) {
+                    dates.push(<div key={`pad-${i}`} className="aspect-square" />)
+                  }
+
+                  // Add all dates
+                  const totalDays = lastDay.getDate()
+                  for (let day = 1; day <= totalDays; day++) {
+                    const date = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), day)
+                    date.setHours(0, 0, 0, 0)
+                    const isPast = date < today
+                    const maxDate = new Date()
+                    maxDate.setDate(maxDate.getDate() + 16)
+                    const isTooFar = date > maxDate // 16 days limit (Open-Meteo)
+                    const isSelected = date.toDateString() === selectedDate.toDateString()
+                    const isTodayDate = date.toDateString() === new Date().toDateString()
+                    const isDisabled = isPast || isTooFar
+
+                    dates.push(
+                      <button
+                        key={day}
+                        onClick={() => {
+                          if (!isDisabled) {
+                            setSelectedDate(date)
+                            setShowDatePicker(false)
+                          }
+                        }}
+                        disabled={isDisabled}
+                        className={`aspect-square rounded-lg text-sm font-semibold transition-all ${
+                          isSelected
+                            ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg scale-110'
+                            : isTodayDate
+                            ? 'bg-blue-100 text-blue-700 border-2 border-blue-500 hover:scale-105'
+                            : isDisabled
+                            ? 'text-gray-300 cursor-not-allowed'
+                            : 'bg-white hover:bg-blue-50 text-gray-700 border border-gray-200 hover:scale-105'
+                        }`}
+                      >
+                        {day}
+                      </button>
+                    )
+                  }
+
+                  return dates
+                })()}
+              </div>
+
+              <div className="mt-3 text-xs text-gray-600 text-center">
+                Select any date within the next 16 days for accurate forecasts
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Horizontal Scrolling Date Picker */}
+        <div className="relative">
+          <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-blue-400 scrollbar-track-blue-100 pb-2">
+            <div className="flex gap-3 min-w-max">
+              {getNext16Days().map((date, index) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedDate(date)}
+                  className={`flex-shrink-0 px-6 py-3 rounded-xl font-semibold transition-all ${
+                    date.toDateString() === selectedDate.toDateString()
+                      ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg scale-105'
+                      : 'bg-white hover:bg-blue-50 text-gray-700 border border-blue-100 hover:scale-105'
+                  }`}
+                >
+                  <div className="text-xs opacity-75">
+                    {isToday(date) ? 'Today' : date.toLocaleDateString('en-US', { weekday: 'short' })}
+                  </div>
+                  <div className="text-lg font-bold">{formatDate(date)}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* Scroll hint arrows */}
+          <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white/80 to-transparent pointer-events-none" />
+        </div>
+
+        {!isToday(selectedDate) && weatherData?.is_forecast && (
+          <div className="mt-3 p-3 bg-green-50 rounded-lg border border-green-300">
+            <p className="text-sm text-green-900">
+              <strong>📅 Forecast Mode:</strong> Showing predicted weather for {formatFullDate(selectedDate)}.
+            </p>
+            <p className="text-xs text-green-700 mt-2">
+              {weatherData?.data_source || 'Weather forecast powered by Open-Meteo'} •
+              Forecasts up to 16 days available with decreasing accuracy over time.
+            </p>
+          </div>
+        )}
+        {!isToday(selectedDate) && !weatherData?.is_forecast && (
+          <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <p className="text-sm text-blue-800">
+              <strong>ℹ️ Current Conditions:</strong> Selected date is today. Showing real-time weather data.
+            </p>
+          </div>
+        )}
+      </motion.div>
+
       {/* Current Weather */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
@@ -266,6 +504,16 @@ const WeatherCard = ({ weatherData, aqi, loading }) => {
       >
         <div className="flex items-center justify-between">
           <div className="flex-1">
+            {weatherData?.is_forecast && (
+              <div className="text-xs font-semibold text-blue-600 mb-1 uppercase tracking-wider">
+                📅 {formatFullDate(selectedDate)} Forecast
+              </div>
+            )}
+            {!weatherData?.is_forecast && isToday(selectedDate) && (
+              <div className="text-xs font-semibold text-green-600 mb-1 uppercase tracking-wider">
+                ⚡ Real-time Current Conditions
+              </div>
+            )}
             <div className="text-7xl font-black text-gray-800 mb-2">
               {convertTemp(current?.temperature)}{getTempUnit()}
             </div>
@@ -301,7 +549,7 @@ const WeatherCard = ({ weatherData, aqi, loading }) => {
         </div>
       </motion.div>
 
-      {/* Extended Weather Metrics Grid */}
+      {/* Extended Weather Metrics Grid - Horizontal Scroll */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -311,15 +559,20 @@ const WeatherCard = ({ weatherData, aqi, loading }) => {
         <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
           <Thermometer className="text-blue-600" size={20} />
           Detailed Conditions
+          <span className="text-xs text-gray-500 font-normal ml-2">(Scroll horizontally →)</span>
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+
+        {/* Horizontal scrolling container */}
+        <div className="relative">
+          <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-blue-400 scrollbar-track-blue-100 pb-4">
+            <div className="flex gap-4 min-w-max">
 
           {/* Feels Like Temperature */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 }}
-            className="p-4 bg-gradient-to-br from-orange-50 to-red-50 rounded-xl border border-orange-100 hover:shadow-lg transition-shadow"
+            className="flex-shrink-0 w-48 p-4 bg-gradient-to-br from-orange-50 to-red-50 rounded-xl border border-orange-100 hover:shadow-lg transition-shadow"
           >
             <div className="flex items-center gap-3 mb-2">
               <Thermometer className="text-orange-600" size={24} />
@@ -336,7 +589,7 @@ const WeatherCard = ({ weatherData, aqi, loading }) => {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.35 }}
-            className={`p-4 bg-gradient-to-br ${getUVBgColor(current?.uv_index)} rounded-xl border ${getUVBorderColor(current?.uv_index)} hover:shadow-lg transition-shadow`}
+            className={`flex-shrink-0 w-48 p-4 bg-gradient-to-br ${getUVBgColor(current?.uv_index)} rounded-xl border ${getUVBorderColor(current?.uv_index)} hover:shadow-lg transition-shadow`}
           >
             <div className="flex items-center gap-3 mb-2">
               <Sun className={getUVColor(current?.uv_index)} size={24} />
@@ -355,7 +608,7 @@ const WeatherCard = ({ weatherData, aqi, loading }) => {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4 }}
-            className="p-4 bg-gradient-to-br from-cyan-50 to-blue-50 rounded-xl border border-cyan-100 hover:shadow-lg transition-shadow"
+            className="flex-shrink-0 w-48 p-4 bg-gradient-to-br from-cyan-50 to-blue-50 rounded-xl border border-cyan-100 hover:shadow-lg transition-shadow"
           >
             <div className="flex items-center gap-3 mb-2">
               <Eye className="text-cyan-600" size={24} />
@@ -374,7 +627,7 @@ const WeatherCard = ({ weatherData, aqi, loading }) => {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.45 }}
-            className="p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-100 hover:shadow-lg transition-shadow"
+            className="flex-shrink-0 w-48 p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-100 hover:shadow-lg transition-shadow"
           >
             <div className="flex items-center gap-3 mb-2">
               <Gauge className="text-indigo-600" size={24} />
@@ -393,7 +646,7 @@ const WeatherCard = ({ weatherData, aqi, loading }) => {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.5 }}
-            className="p-4 bg-gradient-to-br from-teal-50 to-green-50 rounded-xl border border-teal-100 hover:shadow-lg transition-shadow"
+            className="flex-shrink-0 w-48 p-4 bg-gradient-to-br from-teal-50 to-green-50 rounded-xl border border-teal-100 hover:shadow-lg transition-shadow"
           >
             <div className="flex items-center gap-3 mb-2">
               <Droplets className="text-teal-600" size={24} />
@@ -410,7 +663,7 @@ const WeatherCard = ({ weatherData, aqi, loading }) => {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.55 }}
-            className="p-4 bg-gradient-to-br from-gray-50 to-slate-100 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow"
+            className="flex-shrink-0 w-48 p-4 bg-gradient-to-br from-gray-50 to-slate-100 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow"
           >
             <div className="flex items-center gap-3 mb-2">
               <CloudCog className="text-gray-600" size={24} />
@@ -427,7 +680,7 @@ const WeatherCard = ({ weatherData, aqi, loading }) => {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.6 }}
-            className="p-4 bg-gradient-to-br from-emerald-50 to-lime-50 rounded-xl border border-emerald-100 hover:shadow-lg transition-shadow"
+            className="flex-shrink-0 w-48 p-4 bg-gradient-to-br from-emerald-50 to-lime-50 rounded-xl border border-emerald-100 hover:shadow-lg transition-shadow"
           >
             <div className="flex items-center gap-3 mb-2">
               <Wind className={getWindColor(current?.wind_gusts)} size={24} />
@@ -446,7 +699,7 @@ const WeatherCard = ({ weatherData, aqi, loading }) => {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.65 }}
-            className="p-4 bg-gradient-to-br from-blue-50 to-sky-50 rounded-xl border border-blue-100 hover:shadow-lg transition-shadow"
+            className="flex-shrink-0 w-48 p-4 bg-gradient-to-br from-blue-50 to-sky-50 rounded-xl border border-blue-100 hover:shadow-lg transition-shadow"
           >
             <div className="flex items-center gap-3 mb-2">
               <CloudRain className="text-blue-600" size={24} />
@@ -458,6 +711,10 @@ const WeatherCard = ({ weatherData, aqi, loading }) => {
             <div className="text-xs text-gray-500 mt-1">mm</div>
           </motion.div>
 
+            </div>
+          </div>
+          {/* Scroll hint gradient on right */}
+          <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white/90 via-white/50 to-transparent pointer-events-none rounded-r-2xl" />
         </div>
       </motion.div>
 

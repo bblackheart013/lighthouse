@@ -15,6 +15,7 @@ import { BrowserRouter } from 'react-router-dom'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import App from './App.jsx'
 import './index.css'
+import 'mapbox-gl/dist/mapbox-gl.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

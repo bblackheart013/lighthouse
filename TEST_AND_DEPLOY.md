@@ -180,7 +180,7 @@ chmod +x test_api.sh
 
 ```bash
 # Navigate to project root
-cd /Users/mohdsarfarazfaiyaz/signsense/clearskies/clearskies
+cd /Users/mohdsarfarazfaiyaz/signsense/lighthouse/lighthouse
 
 # Initialize git
 git init
@@ -215,7 +215,7 @@ git push -u origin main
 
 ```bash
 # Navigate to project root
-cd /Users/mohdsarfarazfaiyaz/signsense/clearskies/clearskies
+cd /Users/mohdsarfarazfaiyaz/signsense/lighthouse/lighthouse
 
 # Pull latest changes
 git pull origin main
@@ -426,7 +426,7 @@ npm run dev
    - Click "New +" → "Web Service"
    - Connect your GitHub repo: `anubhavpgit/SpaceAppFlask`
    - Settings:
-     - **Name:** `clearskies-api`
+     - **Name:** `lighthouse-api`
      - **Environment:** `Python 3`
      - **Build Command:** `cd flask_api && pip install -r requirements.txt`
      - **Start Command:** `cd flask_api && gunicorn app:app`
@@ -441,7 +441,7 @@ npm run dev
 
 6. **Get your backend URL:**
    ```
-   https://clearskies-api.onrender.com
+   https://lighthouse-api.onrender.com
    ```
 
 ---
@@ -450,7 +450,7 @@ npm run dev
 
 1. **Update `frontend/.env.production`:**
    ```bash
-   VITE_API_URL=https://clearskies-api.onrender.com
+   VITE_API_URL=https://lighthouse-api.onrender.com
    ```
 
 2. **Test production build locally:**
@@ -481,13 +481,13 @@ npm run dev
      - **Output Directory:** `dist`
    - Environment Variables:
      ```
-     VITE_API_URL=https://clearskies-api.onrender.com
+     VITE_API_URL=https://lighthouse-api.onrender.com
      ```
    - Click "Deploy"
 
 5. **Your live app:**
    ```
-   https://clearskies.vercel.app
+   https://lighthouse.vercel.app
    ```
 
 ---
@@ -576,7 +576,7 @@ CORS(app, resources={
         "origins": [
             "http://localhost:3000",
             "http://localhost:5173",
-            "https://clearskies.vercel.app"  # Add production URL
+            "https://lighthouse.vercel.app"  # Add production URL
         ]
     }
 })

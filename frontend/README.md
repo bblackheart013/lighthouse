@@ -1,4 +1,4 @@
-# 🌤️ ClearSkies v3 - Frontend
+# 🌤️ Lighthouse v3 - Frontend
 
 > **"The future of air isn't just predicted — it's understood."**
 

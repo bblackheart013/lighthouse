@@ -1,4 +1,4 @@
-# 🌍 ClearSkies v3 - Team Handoff
+# 🌍 Lighthouse v3 - Team Handoff
 
 > **Everything you need to launch this NASA Space Apps Challenge 2025 project**
 
@@ -66,7 +66,7 @@ python app.py
 **Push to GitHub (1 minute):**
 ```bash
 git add .
-git commit -m "🌍 ClearSkies v3 - Complete backend + specs"
+git commit -m "🌍 Lighthouse v3 - Complete backend + specs"
 git push origin main
 ```
 
@@ -156,7 +156,7 @@ export const apiService = {
 ## 📂 File Structure
 
 ```
-ClearSkies/
+Lighthouse/
 ├── flask_api/               # Backend (DONE ✓)
 │   ├── app.py              # Flask application
 │   ├── predictor.py        # ML engine
@@ -292,7 +292,7 @@ CORS(app, resources={
     r"/*": {
         "origins": [
             "http://localhost:5173",
-            "https://clearskies.vercel.app"  # Add production URL
+            "https://lighthouse.vercel.app"  # Add production URL
         ]
     }
 })
@@ -344,7 +344,7 @@ python download_tempo.py
 2. **Push to GitHub** (You - 2 min)
    ```bash
    git add .
-   git commit -m "🌍 ClearSkies v3 - Complete"
+   git commit -m "🌍 Lighthouse v3 - Complete"
    git push origin main
    ```
 

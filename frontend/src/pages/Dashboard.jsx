@@ -22,7 +22,8 @@ import { MetricTooltip } from '../components/Tooltip'
 import BreathScoreCard from '../components/BreathScoreCard'
 import WeatherCard from '../components/WeatherCard'
 import LiveDataFeed from '../components/LiveDataFeed'
-import Globe3D from '../components/Globe3D'
+import MapboxInteractive from '../components/MapboxInteractive'
+import MapboxTest from '../components/MapboxTest'
 import TempoDataIndicator from '../components/TempoDataIndicator'
 import { apiService } from '../services/api'
 import { getAQIColor, getAQIGradient, getAQILabel, getHealthRecommendation, getAQITrend } from '../utils/aqi'
@@ -40,13 +41,35 @@ const Dashboard = () => {
   const [error, setError] = useState(null)
   const [lastUpdate, setLastUpdate] = useState(new Date())
   const [countdown, setCountdown] = useState(60)
+  const [selectedDate, setSelectedDate] = useState(new Date())
   const { location } = useLocation()
 
   const { lat, lon, city } = location
 
+  // Fetch weather data for a specific date
+  const fetchWeatherForDate = useCallback(async (date) => {
+    try {
+      const dateStr = date.toISOString().split('T')[0]
+      const weather = await apiService.getWeather(lat, lon, dateStr)
+      setWeatherData(weather)
+      console.log(`📅 Weather updated for date: ${dateStr}`)
+    } catch (err) {
+      console.error('Error fetching weather for date:', err)
+    }
+  }, [lat, lon])
+
+  // Handle date change
+  const handleDateChange = useCallback(async (newDate) => {
+    setSelectedDate(newDate)
+    await fetchWeatherForDate(newDate)
+  }, [fetchWeatherForDate])
+
   const fetchData = useCallback(async () => {
     try {
       setLoading(true)
+
+      // Format current date for weather API
+      const dateStr = new Date().toISOString().split('T')[0]
 
       // Fetch all data in parallel
       const [forecast, wildfires, ground, breath, weather, locDetails] = await Promise.all([
@@ -54,7 +77,7 @@ const Dashboard = () => {
         apiService.getWildfires(lat, lon, 100),
         apiService.getGroundSensors(lat, lon),
         apiService.getBreathScore(lat, lon).catch(() => null),
-        apiService.getWeather(lat, lon).catch(() => null),
+        apiService.getWeather(lat, lon, dateStr).catch(() => null),
         apiService.reverseGeocode(lat, lon).catch(() => null)
       ])
 
@@ -77,6 +100,8 @@ const Dashboard = () => {
   }, [lat, lon, city])
 
   useEffect(() => {
+    // Reset to today when location changes
+    setSelectedDate(new Date())
     fetchData()
     // Refresh every 60 seconds
     const interval = setInterval(fetchData, 60000)
@@ -118,7 +143,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
-      {/* Interactive Globe3D - FIRST THING ON PAGE */}
+      {/* Interactive Mapbox Map - FIRST THING ON PAGE */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -129,24 +154,18 @@ const Dashboard = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
             <div className="text-center mb-6">
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-3 bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
-                🌍 Explore Earth
+                🗺️ Interactive Air Quality Map
               </h2>
               <p className="text-white/80 text-lg md:text-xl font-medium">
-                Click anywhere on Earth to see air quality in real-time
+                Click anywhere on the map to see weather & air quality data
               </p>
               <p className="text-white/60 text-sm mt-2">
-                Interactive 3D globe powered by NASA satellite data
+                Powered by Mapbox satellite imagery & NASA TEMPO data
               </p>
             </div>
 
-            <div className="flex justify-center" style={{ minHeight: '600px' }}>
-              <Globe3D
-                key={`${location.lat}-${location.lon}`}
-                selectedLocation={location}
-                onLocationClick={(clickedLat, clickedLon) => {
-                  console.log('Globe clicked:', clickedLat, clickedLon)
-                }}
-              />
+            <div className="w-full rounded-2xl overflow-hidden shadow-2xl" style={{ height: '600px' }}>
+              <MapboxInteractive />
             </div>
           </div>
         </div>
@@ -197,13 +216,22 @@ const Dashboard = () => {
             </p>
           )}
 
+          {/* AQI Label */}
+          <div className="text-white/80 text-xl md:text-2xl font-medium mb-2 tracking-wider">
+            AIR QUALITY INDEX (AQI)
+          </div>
+
           {/* Giant AQI Number with CountUp */}
           <div className="text-white text-9xl md:text-[12rem] font-black leading-none mb-4">
             <CountUp end={aqi} duration={1.5} />
           </div>
 
-          <div className="text-white text-3xl md:text-4xl font-semibold mb-6">
+          <div className="text-white text-3xl md:text-4xl font-semibold mb-2">
             {category}
+          </div>
+
+          <div className="text-white/60 text-sm mb-4">
+            EPA Standard Scale (0-500)
           </div>
 
           {/* Health Recommendation */}
@@ -282,8 +310,14 @@ const Dashboard = () => {
 
         {/* Featured Cards: Breath Score & Weather */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <BreathScoreCard breathData={breathData} loading={loading && !breathData} />
-          <WeatherCard weatherData={weatherData} aqi={aqi} loading={loading && !weatherData} />
+          <BreathScoreCard breathData={breathData} aqi={aqi} loading={loading && !breathData} />
+          <WeatherCard
+            weatherData={weatherData}
+            aqi={aqi}
+            loading={loading && !weatherData}
+            selectedDate={selectedDate}
+            onDateChange={handleDateChange}
+          />
         </div>
 
         {/* NASA TEMPO Satellite Data Indicator */}
@@ -424,7 +458,10 @@ const Dashboard = () => {
 
               // If no ground data for this pollutant, estimate from NASA TEMPO NO2
               if (!pollutantData && prediction?.no2_molecules_cm2) {
-                const no2_ppb = (prediction.no2_molecules_cm2 / 2.69e16) * 1000
+                // Convert: API returns value in 10^15 molecules/cm² units
+                // 1e15 molecules/cm² ≈ 20 ppb NO2
+                const no2_in_1e15_units = prediction.no2_molecules_cm2
+                const no2_ppb = no2_in_1e15_units * 20
 
                 if (pollutant === 'NO2') {
                   pollutantData = {
@@ -541,13 +578,20 @@ const Dashboard = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* AQI Explainer */}
+            {/* AQI vs Breath Score Explainer */}
             <div className="bg-white/5 rounded-xl p-6 border border-white/10">
-              <h4 className="text-lg font-semibold text-white mb-3">What is AQI?</h4>
-              <p className="text-white/70 text-sm leading-relaxed">
-                The Air Quality Index (AQI) is an EPA standard that tells you how clean or polluted your air is.
-                Values range from 0-500, where higher values indicate greater health concerns.
-              </p>
+              <h4 className="text-lg font-semibold text-white mb-3">Understanding the Scores</h4>
+              <div className="space-y-3 text-white/70 text-sm leading-relaxed">
+                <div>
+                  <span className="font-bold text-white">AQI (0-500):</span> EPA standard measuring air pollution levels
+                </div>
+                <div>
+                  <span className="font-bold text-white">Breath Score (0-100):</span> Custom health metric combining AQI, weather, wildfires & personal impact
+                </div>
+                <p className="text-white/50 text-xs mt-2">
+                  Higher AQI = worse air. Higher Breath Score = better health conditions.
+                </p>
+              </div>
             </div>
 
             {/* Best Time for Activities */}

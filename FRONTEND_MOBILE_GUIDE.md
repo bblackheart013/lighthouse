@@ -866,7 +866,7 @@ export const notificationService = {
 
 ```json
 {
-  "name": "clearskies-mobile",
+  "name": "lighthouse-mobile",
   "version": "3.0.0",
   "main": "expo-router/entry",
   "scripts": {

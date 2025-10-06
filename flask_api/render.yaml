@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: lighthouse-api
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.6
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: FIRMS_MAP_KEY
+        sync: false
+      - key: WAQI_API_TOKEN
+        sync: false

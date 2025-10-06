@@ -143,13 +143,16 @@ export const apiService = {
    *
    * @param {number} lat - Latitude
    * @param {number} lon - Longitude
+   * @param {string} date - Optional target date in YYYY-MM-DD format
    * @returns {Promise} Weather conditions, temperature, wind
    */
-  getWeather: async (lat, lon) => {
+  getWeather: async (lat, lon, date = null) => {
     try {
-      const response = await api.get('/weather', {
-        params: { lat, lon }
-      });
+      const params = { lat, lon }
+      if (date) {
+        params.date = date
+      }
+      const response = await api.get('/weather', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching weather:', error);

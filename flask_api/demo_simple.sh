@@ -1,12 +1,12 @@
 #!/bin/bash
-# ClearSkies Unified Intelligence Demo
+# Lighthouse Unified Intelligence Demo
 # NASA Space Apps Challenge 2024
 
 API_BASE="http://127.0.0.1:5001"
 
 echo ""
 echo "======================================================================"
-echo "  ClearSkies - Unified Air Quality Intelligence"
+echo "  Lighthouse - Unified Air Quality Intelligence"
 echo "======================================================================"
 echo ""
 echo "  Merging three worlds of data:"

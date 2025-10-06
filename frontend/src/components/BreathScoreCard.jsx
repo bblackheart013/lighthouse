@@ -86,7 +86,10 @@ const BreathScoreCard = ({ breathData, loading }) => {
             <Activity className="text-blue-600" size={32} />
             Breath Quality Score
           </h2>
-          <p className="text-gray-600 mt-1">Your personalized air quality health metric</p>
+          <p className="text-gray-600 mt-1">Personalized 0-100 health metric</p>
+          <p className="text-gray-500 text-xs mt-1">
+            Based on AQI, weather, wildfires, and health impact factors
+          </p>
         </div>
       </div>
 

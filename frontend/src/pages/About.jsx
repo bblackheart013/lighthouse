@@ -11,7 +11,7 @@
 
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Satellite, Database, Cloud, Target, Users, Zap, Globe, Heart, Award, Flame, Sparkles, Server } from 'lucide-react'
+import { Satellite, Database, Cloud, Target, Users, Zap, Globe, Heart, Award, Flame, Sparkles, Server, Code, Linkedin, ExternalLink, Coffee } from 'lucide-react'
 
 const About = () => {
   const features = [
@@ -430,23 +430,28 @@ const About = () => {
         <h3 className="text-2xl font-bold text-slate-800 mb-2">
           NASA Space Apps Challenge 2025
         </h3>
+        <div className="inline-block mb-4">
+          <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md">
+            Team Interstellar Frontiers
+          </span>
+        </div>
         <p className="text-slate-600 mb-4">
-          Lighthouse v3 is our submission to the world's largest global hackathon,
-          addressing the challenge of making NASA's Earth observation data accessible
-          and actionable for communities worldwide.
+          Lighthouse is our submission to the world's largest global hackathon,
+          built in 24+ hours with zero sleep, turning NASA's powerful Earth observation data into
+          something anyone can use to protect themselves and their families.
         </p>
-        <div className="flex items-center justify-center space-x-8 text-sm text-slate-600">
+        <div className="flex items-center justify-center space-x-8 text-sm">
           <div>
             <p className="font-semibold text-slate-800">Data Sources</p>
-            <p>NASA, NOAA, OpenAQ</p>
+            <p className="text-slate-700">NASA, NOAA, OpenAQ</p>
           </div>
           <div>
             <p className="font-semibold text-slate-800">Technology</p>
-            <p>React, Python, ML</p>
+            <p className="text-slate-700">React, Python, ML</p>
           </div>
           <div>
             <p className="font-semibold text-slate-800">Impact</p>
-            <p>Global Health</p>
+            <p className="text-slate-700">Global Health</p>
           </div>
         </div>
       </motion.div>
@@ -564,11 +569,260 @@ const About = () => {
         </div>
       </motion.div>
 
-      {/* Call to Action */}
+      {/* Team Section - The Builders */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 2.7 }}
+        className="mt-20 mb-16"
+      >
+        <div className="text-center mb-12">
+          <div className="inline-block p-4 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl shadow-xl mb-6">
+            <Heart className="text-white" size={56} />
+          </div>
+          <h2 className="text-4xl font-bold text-slate-800 mb-4">
+            The Humans Behind Lighthouse
+          </h2>
+          <div className="inline-block mb-6">
+            <div className="bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 text-white px-8 py-3 rounded-full shadow-lg">
+              <p className="text-2xl font-bold tracking-wide">⭐ Team Interstellar Frontiers ⭐</p>
+            </div>
+          </div>
+          <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+            Five dreamers who came together at NASA Space Apps Challenge 2025, united by a simple belief:
+            <span className="font-semibold text-slate-800"> everyone deserves to breathe clean air and know when they're at risk</span>.
+          </p>
+        </div>
+
+        {/* Team Members Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+          {/* Vishwa Shah */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 2.8 }}
+            className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all border-2 border-blue-200 hover:border-blue-400 group"
+          >
+            <div className="text-center mb-6">
+              <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <span className="text-3xl font-bold text-white">VS</span>
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-2">Vishwa Shah</h3>
+              <p className="text-slate-600 text-sm italic mb-4">Architect of Intelligence</p>
+            </div>
+            <a
+              href="https://www.linkedin.com/in/vishwadipeshshah/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center space-x-2 px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors shadow-md"
+            >
+              <Linkedin size={20} />
+              <span className="font-semibold">Connect on LinkedIn</span>
+            </a>
+          </motion.div>
+
+          {/* Shoa Afroz */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 2.9 }}
+            className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all border-2 border-purple-200 hover:border-purple-400 group"
+          >
+            <div className="text-center mb-6">
+              <div className="w-24 h-24 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <span className="text-3xl font-bold text-white">SA</span>
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-2">Shoa Afroz</h3>
+              <p className="text-slate-600 text-sm italic mb-4">Guardian of User Experience</p>
+            </div>
+            <a
+              href="https://www.linkedin.com/in/shoaafroz/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center space-x-2 px-4 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors shadow-md"
+            >
+              <Linkedin size={20} />
+              <span className="font-semibold">Connect on LinkedIn</span>
+            </a>
+          </motion.div>
+
+          {/* Anubhab Patnaik */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 3.0 }}
+            className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all border-2 border-green-200 hover:border-green-400 group"
+          >
+            <div className="text-center mb-6">
+              <div className="w-24 h-24 bg-gradient-to-br from-green-600 to-emerald-600 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <span className="text-3xl font-bold text-white">AP</span>
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-2">Anubhab Patnaik</h3>
+              <p className="text-slate-600 text-sm italic mb-4">Master of Systems</p>
+            </div>
+            <a
+              href="https://www.linkedin.com/in/anubhabpatnaik/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center space-x-2 px-4 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors shadow-md"
+            >
+              <Linkedin size={20} />
+              <span className="font-semibold">Connect on LinkedIn</span>
+            </a>
+          </motion.div>
+
+          {/* Hariharan Loganathan */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 3.1 }}
+            className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all border-2 border-orange-200 hover:border-orange-400 group"
+          >
+            <div className="text-center mb-6">
+              <div className="w-24 h-24 bg-gradient-to-br from-orange-600 to-red-600 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <span className="text-3xl font-bold text-white">HL</span>
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-2">Hariharan Loganathan</h3>
+              <p className="text-slate-600 text-sm italic mb-4">Weaver of Data</p>
+            </div>
+            <a
+              href="https://www.linkedin.com/in/hariharan-logan/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center space-x-2 px-4 py-3 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition-colors shadow-md"
+            >
+              <Linkedin size={20} />
+              <span className="font-semibold">Connect on LinkedIn</span>
+            </a>
+          </motion.div>
+
+          {/* Mohd Sarfaraz Faiyaz */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 3.2 }}
+            className="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all border-2 border-cyan-200 hover:border-cyan-400 group lg:col-span-1 md:col-start-1 lg:col-start-2"
+          >
+            <div className="text-center mb-6">
+              <div className="w-24 h-24 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <span className="text-3xl font-bold text-white">SF</span>
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-2">Mohd Sarfaraz Faiyaz</h3>
+              <p className="text-slate-600 text-sm italic mb-4">Conductor of Code</p>
+            </div>
+            <div className="flex flex-col space-y-3">
+              <a
+                href="https://www.linkedin.com/in/mohdsarfarazfaiyaz/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center space-x-2 px-4 py-3 bg-cyan-600 text-white rounded-xl hover:bg-cyan-700 transition-colors shadow-md"
+              >
+                <Linkedin size={20} />
+                <span className="font-semibold">LinkedIn</span>
+              </a>
+              <a
+                href="https://mohdsarfarazfaiyaz.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center space-x-2 px-4 py-3 bg-slate-800 text-white rounded-xl hover:bg-slate-900 transition-colors shadow-md"
+              >
+                <ExternalLink size={20} />
+                <span className="font-semibold">Portfolio</span>
+              </a>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* The Heart of It All - Final Note */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 3.3 }}
+          className="relative overflow-hidden"
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-violet-500 via-purple-600 to-indigo-700 opacity-10 rounded-3xl"></div>
+          <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl shadow-2xl p-12 border-2 border-purple-500/30">
+            {/* Decorative Elements */}
+            <div className="absolute top-6 right-6 opacity-20">
+              <Heart className="text-white" size={80} />
+            </div>
+            <div className="absolute bottom-6 left-6 opacity-10">
+              <Sparkles className="text-white" size={100} />
+            </div>
+
+            {/* Content */}
+            <div className="relative z-10">
+              <div className="flex items-center justify-center mb-8">
+                <div className="flex items-center space-x-3">
+                  <Coffee className="text-amber-400" size={32} />
+                  <Heart className="text-red-400 animate-pulse" size={40} />
+                  <Code className="text-blue-400" size={32} />
+                </div>
+              </div>
+
+              <h3 className="text-3xl md:text-4xl font-bold text-center text-white mb-6">
+                Built with Love, Fueled by Purpose
+              </h3>
+
+              <div className="max-w-4xl mx-auto space-y-6 text-lg text-white/90 leading-relaxed">
+                <p className="text-center">
+                  We didn't build Lighthouse for a prize. We built it because <span className="font-bold text-white">we care</span>.
+                </p>
+
+                <p>
+                  <span className="font-bold text-yellow-300">24+ hours. Zero sleep.</span> That's what it took at <span className="font-bold text-purple-300">NASA Space Apps Challenge 2025</span>.
+                  Five people, scattered across time zones, fueled by coffee and stubborn determination. We — <span className="font-bold text-cyan-300">Team Interstellar Frontiers</span> — built Lighthouse
+                  because we couldn't stand the thought of another parent wondering if it's safe for their kid to play outside.
+                </p>
+
+                <p>
+                  Here's the truth: air pollution kills 7 million people every year. That's not a statistic to us anymore. That's someone's mom.
+                  Someone's kid. Someone who ran outside thinking everything was fine. We got tired of watching people suffer from something invisible,
+                  something they can't see but definitely feel in their lungs, their hearts, their lives.
+                </p>
+
+                <p>
+                  So we built this. Not for glory. Not for recognition. We built it at 3 AM when our eyes were burning and our code wasn't working
+                  because we couldn't sleep knowing NASA had this incredible satellite data that could save lives, and most people had no idea it existed
+                  or how to use it.
+                </p>
+
+                <p>
+                  Is Lighthouse perfect? Hell no. We built it in 24 hours. There are bugs we haven't found, features we wish we had time for,
+                  optimizations we'll add later. But you know what? It works. It's real. And if even one person uses this to decide
+                  "maybe I shouldn't take my kid to the park today" and that keeps them safe — then every sleepless hour was worth it.
+                </p>
+
+                <p>
+                  We're just five people who care too much to do nothing. Different backgrounds, different skills, same belief:
+                  <span className="font-bold text-purple-300"> technology should protect people, not just impress them</span>.
+                </p>
+
+                <div className="pt-6 border-t border-white/20 mt-8">
+                  <p className="text-center text-xl font-semibold text-purple-300">
+                    To every person who uses Lighthouse to make a safer decision,
+                  </p>
+                  <p className="text-center text-2xl font-bold text-white mt-2">
+                    That's why we built this. That's why we care.
+                  </p>
+                </div>
+
+                <p className="text-center italic text-white/70 text-base mt-8">
+                  — Team Interstellar Frontiers<br/>
+                  <span className="text-purple-300 font-semibold">Lighthouse • 24+ Hours • Zero Sleep • Built for Everyone</span><br/>
+                  NASA Space Apps Challenge 2025
+                </p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+
+      {/* Call to Action */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 3.5 }}
         className="mt-16 text-center"
       >
         <p className="text-slate-600 text-lg mb-4">
