@@ -159,8 +159,8 @@ We integrate data from:
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/lighthouse-air-quality.git
-cd lighthouse-air-quality
+git clone https://github.com/bblackheart013/lighthouse.git
+cd lighthouse
 ```
 
 ### 2. Backend Setup
@@ -455,7 +455,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 ## 📞 Contact & Support
 
 ### Found a bug?
-Open an issue on [GitHub Issues](https://github.com/YOUR_USERNAME/lighthouse-air-quality/issues)
+Open an issue on [GitHub Issues](https://github.com/bblackheart013/lighthouse/issues)
 
 ### Have a question?
 Check our [Documentation](#features) or reach out to the team on LinkedIn (see [team section](#-the-humans-behind-lighthouse) above)
