@@ -438,44 +438,44 @@ const Alerts = () => {
       transition={{ duration: 0.5 }}
       className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50"
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-12"
         >
-          <div className="flex items-center justify-center space-x-4 mb-6">
-            <div className="p-4 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-2xl shadow-lg">
-              <Bell className="text-white" size={48} />
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+            <div className="p-3 sm:p-4 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-xl sm:rounded-2xl shadow-lg">
+              <Bell className="text-white" size={40} />
             </div>
-            <div className="text-left">
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-cyan-500 to-indigo-600 bg-clip-text text-transparent">
+            <div className="text-center sm:text-left">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-cyan-500 to-indigo-600 bg-clip-text text-transparent">
                 Health Alerts
               </h1>
-              <p className="text-slate-600 text-lg mt-1">
+              <p className="text-slate-600 text-sm sm:text-base md:text-lg mt-1">
                 Personalized, AI-powered, and actionable
               </p>
             </div>
           </div>
 
-          <div className="flex items-center justify-center space-x-6 text-sm">
-            <div className="flex items-center space-x-2">
-              <MapPin size={16} className="text-blue-600" />
-              <span className="text-slate-700 font-medium">
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <MapPin size={14} className="text-blue-600 flex-shrink-0" />
+              <span className="text-slate-700 font-medium break-all">
                 {forecastData?.location?.details?.city || `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`}
               </span>
             </div>
-            <div className="flex items-center space-x-2">
-              <Clock size={16} className="text-slate-500" />
+            <div className="flex items-center gap-1 sm:gap-2">
+              <Clock size={14} className="text-slate-500 flex-shrink-0" />
               <span className="text-slate-600">
                 {new Date().toLocaleTimeString()}
               </span>
             </div>
             {alerts.length > 0 && (
-              <div className="flex items-center space-x-2 px-3 py-1 bg-orange-100 rounded-full">
-                <AlertCircle size={16} className="text-orange-700" />
-                <span className="text-orange-900 font-semibold">
+              <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 bg-orange-100 rounded-full">
+                <AlertCircle size={14} className="text-orange-700 flex-shrink-0" />
+                <span className="text-orange-900 font-semibold whitespace-nowrap">
                   {alerts.length} Active Alert{alerts.length > 1 ? 's' : ''}
                 </span>
               </div>

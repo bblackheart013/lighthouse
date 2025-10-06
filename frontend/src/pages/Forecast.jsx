@@ -395,38 +395,38 @@ const Forecast = () => {
       animate={{ opacity: 1 }}
       className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-violet-50"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
 
         {/* Header with Location */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
+          className="text-center mb-6 sm:mb-8"
         >
-          <h1 className="text-5xl font-black bg-gradient-to-r from-slate-900 via-blue-700 to-violet-700 bg-clip-text text-transparent mb-2">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-slate-900 via-blue-700 to-violet-700 bg-clip-text text-transparent mb-2 px-2">
             Your Forecast
           </h1>
-          <p className="text-slate-600 text-lg">{city}</p>
+          <p className="text-slate-600 text-base sm:text-lg px-2">{city}</p>
         </motion.div>
 
         {/* Calendar & Date Selection */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-6 mb-8 border border-white/20"
+          className="bg-white/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 mb-6 sm:mb-8 border border-white/20"
         >
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <Calendar className="text-violet-600" size={24} />
-              <h2 className="text-2xl font-bold text-slate-800">Select Date</h2>
-              <span className="text-sm text-slate-500">({formatFullDate(selectedDate)})</span>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-4">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+              <Calendar className="text-violet-600 flex-shrink-0" size={20} />
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-800">Select Date</h2>
+              <span className="text-xs sm:text-sm text-slate-500 break-all">({formatFullDate(selectedDate)})</span>
             </div>
 
             <button
               onClick={() => setShowCalendar(!showCalendar)}
-              className="p-3 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white hover:shadow-lg transition-all hover:scale-105"
+              className="p-2 sm:p-3 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white hover:shadow-lg transition-all hover:scale-105 flex-shrink-0 self-end sm:self-auto"
             >
-              <Calendar size={20} />
+              <Calendar size={18} className="sm:w-5 sm:h-5" />
             </button>
           </div>
 
@@ -524,37 +524,37 @@ const Forecast = () => {
           {/* Quick date picker with scroll indicators */}
           <div className="relative">
             {/* Left scroll indicator */}
-            <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-white via-white/80 to-transparent pointer-events-none z-10 rounded-l-2xl"></div>
+            <div className="hidden sm:block absolute left-0 top-0 bottom-0 w-12 sm:w-16 bg-gradient-to-r from-white via-white/80 to-transparent pointer-events-none z-10 rounded-l-2xl"></div>
 
             {/* Scroll area */}
             <div className="overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-violet-400 scrollbar-track-violet-100">
-              <div className="flex gap-3 min-w-max px-2">
+              <div className="flex gap-2 sm:gap-3 min-w-max px-1 sm:px-2">
                 {getNext16Days().map((date, i) => (
                   <button
                     key={i}
                     onClick={() => setSelectedDate(date)}
-                    className={`flex-shrink-0 px-5 py-3 rounded-xl font-semibold transition-all ${
+                    className={`flex-shrink-0 px-3 sm:px-4 md:px-5 py-2 sm:py-3 rounded-lg sm:rounded-xl font-semibold transition-all ${
                       date.toDateString() === selectedDate.toDateString()
                         ? 'bg-gradient-to-r from-violet-600 to-blue-600 text-white shadow-lg scale-105'
                         : 'bg-white hover:bg-violet-50 text-slate-700 border border-slate-200 hover:scale-105'
                     }`}
                   >
-                    <div className="text-xs opacity-75">
+                    <div className="text-[10px] sm:text-xs opacity-75 whitespace-nowrap">
                       {isToday(date) ? 'Today' : date.toLocaleDateString('en-US', { weekday: 'short' })}
                     </div>
-                    <div className="text-lg font-bold">{formatDate(date)}</div>
+                    <div className="text-sm sm:text-base md:text-lg font-bold whitespace-nowrap">{formatDate(date)}</div>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Right scroll indicator with arrow */}
-            <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white via-white/80 to-transparent pointer-events-none z-10 rounded-r-2xl flex items-center justify-center">
-              <ChevronRight className="text-violet-600 animate-pulse" size={24} />
+            <div className="hidden sm:flex absolute right-0 top-0 bottom-0 w-12 sm:w-16 bg-gradient-to-l from-white via-white/80 to-transparent pointer-events-none z-10 rounded-r-2xl items-center justify-center">
+              <ChevronRight className="text-violet-600 animate-pulse" size={20} />
             </div>
 
             {/* Scroll hint text */}
-            <div className="text-center mt-2 text-xs text-slate-500">
+            <div className="text-center mt-2 text-[10px] sm:text-xs text-slate-500">
               ← Scroll to see all 16 days →
             </div>
           </div>
@@ -606,30 +606,30 @@ const Forecast = () => {
         </motion.div>
 
         {/* Main Forecast Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-6 sm:mb-8">
 
           {/* Temperature & Condition */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="lg:col-span-2 bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/20"
+            className="lg:col-span-2 bg-white/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 border border-white/20"
           >
-            <div className="flex items-start justify-between mb-6">
-              <div>
-                <p className="text-slate-600 text-sm mb-2">
+            <div className="flex flex-col sm:flex-row items-start sm:items-start justify-between gap-4 sm:gap-0 mb-6">
+              <div className="flex-1">
+                <p className="text-slate-600 text-xs sm:text-sm mb-2">
                   {isToday(selectedDate) ? '⚡ Real-time' : '📅 Forecast'}
                 </p>
-                <h3 className="text-7xl font-black text-slate-900 mb-2">
+                <h3 className="text-5xl sm:text-6xl md:text-7xl font-black text-slate-900 mb-2">
                   {weatherData?.current?.temperature?.toFixed(1) || '--'}°C
                 </h3>
-                <p className="text-2xl text-slate-600 font-medium">
+                <p className="text-lg sm:text-xl md:text-2xl text-slate-600 font-medium">
                   {weatherData?.current?.condition || 'Loading...'}
                 </p>
               </div>
 
-              <div className="text-right">
+              <div className="text-left sm:text-right flex sm:flex-col items-center sm:items-end gap-3 sm:gap-0">
                 {getWeatherIcon(weatherData?.current?.weather_code || 0)}
-                <p className="text-sm text-slate-500 mt-2">
+                <p className="text-xs sm:text-sm text-slate-500 mt-0 sm:mt-2">
                   Feels like {weatherData?.current?.feels_like?.toFixed(1) || '--'}°C
                 </p>
               </div>

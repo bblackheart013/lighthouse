@@ -151,20 +151,20 @@ const Dashboard = () => {
         className="relative"
       >
         <div className="bg-gradient-to-br from-slate-900 via-gray-900 to-black">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
-            <div className="text-center mb-6">
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-3 bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-8 sm:pb-12">
+            <div className="text-center mb-4 sm:mb-6">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 sm:mb-3 bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
                 🗺️ Interactive Air Quality Map
               </h2>
-              <p className="text-white/80 text-lg md:text-xl font-medium">
+              <p className="text-white/80 text-sm sm:text-base md:text-lg lg:text-xl font-medium px-2">
                 Click anywhere on the map to see weather & air quality data
               </p>
-              <p className="text-white/60 text-sm mt-2">
+              <p className="text-white/60 text-xs sm:text-sm mt-1 sm:mt-2 px-2">
                 Powered by Mapbox satellite imagery & NASA TEMPO data
               </p>
             </div>
 
-            <div className="w-full rounded-2xl overflow-hidden shadow-2xl" style={{ height: '600px' }}>
+            <div className="w-full rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl" style={{ height: '400px', maxHeight: '50vh' }}>
               <MapboxInteractive />
             </div>
           </div>
@@ -203,12 +203,12 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-          <h1 className="text-white text-2xl md:text-3xl font-light mb-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 md:py-20 text-center">
+          <h1 className="text-white text-lg sm:text-xl md:text-2xl lg:text-3xl font-light mb-3 sm:mb-4 px-2">
             {locationDetails?.city || apiLocation.city || `${apiLocation.lat}, ${apiLocation.lon}`}
           </h1>
           {locationDetails?.precision && (
-            <p className="text-white/60 text-sm mb-2">
+            <p className="text-white/60 text-xs sm:text-sm mb-2 px-2">
               Precise location: {locationDetails.neighborhood || locationDetails.city}
               {locationDetails.state && `, ${locationDetails.state}`}
               {locationDetails.country && `, ${locationDetails.country}`}
@@ -217,30 +217,30 @@ const Dashboard = () => {
           )}
 
           {/* AQI Label */}
-          <div className="text-white/80 text-xl md:text-2xl font-medium mb-2 tracking-wider">
+          <div className="text-white/80 text-base sm:text-lg md:text-xl lg:text-2xl font-medium mb-2 tracking-wider px-2">
             AIR QUALITY INDEX (AQI)
           </div>
 
           {/* Giant AQI Number with CountUp */}
-          <div className="text-white text-9xl md:text-[12rem] font-black leading-none mb-4">
+          <div className="text-white text-7xl sm:text-8xl md:text-9xl lg:text-[12rem] font-black leading-none mb-3 sm:mb-4">
             <CountUp end={aqi} duration={1.5} />
           </div>
 
-          <div className="text-white text-3xl md:text-4xl font-semibold mb-2">
+          <div className="text-white text-2xl sm:text-3xl md:text-4xl font-semibold mb-2 px-2">
             {category}
           </div>
 
-          <div className="text-white/60 text-sm mb-4">
+          <div className="text-white/60 text-xs sm:text-sm mb-3 sm:mb-4">
             EPA Standard Scale (0-500)
           </div>
 
           {/* Health Recommendation */}
-          <p className="text-white/90 text-lg md:text-xl max-w-2xl mx-auto">
+          <p className="text-white/90 text-sm sm:text-base md:text-lg lg:text-xl max-w-2xl mx-auto px-4">
             {health_guidance.general_public || getHealthRecommendation(aqi)}
           </p>
 
           {/* Last Updated */}
-          <p className="text-white/50 text-sm mt-6">
+          <p className="text-white/50 text-xs sm:text-sm mt-4 sm:mt-6">
             Updated {formatDistanceToNow(lastUpdate, { addSuffix: true })}
           </p>
         </div>
@@ -335,23 +335,23 @@ const Dashboard = () => {
           <LiveDataFeed />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
           {/* Weather Info */}
           {data_sources.weather?.available && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10"
+              className="bg-white/5 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/10"
             >
-              <div className="flex items-center gap-3 mb-4">
-                <Cloud className="w-8 h-8 text-blue-400" />
-                <h3 className="text-xl font-semibold text-white">Weather</h3>
+              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <Cloud className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
+                <h3 className="text-lg sm:text-xl font-semibold text-white">Weather</h3>
               </div>
-              <p className="text-white/70 text-lg mb-2">
+              <p className="text-white/70 text-base sm:text-lg mb-2">
                 {data_sources.weather.conditions}
               </p>
-              <p className="text-white/90 text-2xl font-bold">
+              <p className="text-white/90 text-xl sm:text-2xl font-bold">
                 {data_sources.weather.temperature}
               </p>
             </motion.div>
@@ -451,7 +451,7 @@ const Dashboard = () => {
             <Activity className="w-6 h-6 text-blue-400" />
             <h3 className="text-2xl font-bold text-white">Environmental Metrics</h3>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
             {['PM2.5', 'PM10', 'NO2', 'CO', 'SO2', 'O3'].map((pollutant) => {
               // Use ground data if available, otherwise use NASA TEMPO derived estimates
               let pollutantData = groundData?.[pollutant]
@@ -537,16 +537,16 @@ const Dashboard = () => {
                 return (
                   <div
                     key={pollutant}
-                    className={`${getQualityBg(pollutantData?.quality)} rounded-lg p-4 border border-white/10`}
+                    className={`${getQualityBg(pollutantData?.quality)} rounded-lg p-3 sm:p-4 border border-white/10`}
                   >
-                    <div className="text-white/60 text-sm mb-1">{pollutant}</div>
+                    <div className="text-white/60 text-xs sm:text-sm mb-1">{pollutant}</div>
                     {pollutantData ? (
                       <>
-                        <div className={`text-2xl font-bold ${getQualityColor(pollutantData.quality)} mb-1`}>
+                        <div className={`text-xl sm:text-2xl font-bold ${getQualityColor(pollutantData.quality)} mb-1`}>
                           {pollutantData.value}
                         </div>
                         <div className="text-white/40 text-xs">{pollutantData.unit}</div>
-                        <div className={`text-xs mt-2 capitalize ${getQualityColor(pollutantData.quality)}`}>
+                        <div className={`text-xs mt-1 sm:mt-2 capitalize ${getQualityColor(pollutantData.quality)}`}>
                           {pollutantData.quality?.replace('_', ' ')}
                         </div>
                       </>

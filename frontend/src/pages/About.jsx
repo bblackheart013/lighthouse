@@ -95,7 +95,7 @@ const About = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="text-5xl sm:text-6xl font-bold text-slate-800 mb-6"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-800 mb-4 sm:mb-6 px-4"
         >
           About Lighthouse
         </motion.h1>
@@ -104,7 +104,7 @@ const About = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="text-2xl text-slate-600 italic max-w-3xl mx-auto"
+          className="text-lg sm:text-xl md:text-2xl text-slate-600 italic max-w-3xl mx-auto px-4"
         >
           "The future of air isn't just predicted — it's understood."
         </motion.p>
@@ -117,16 +117,16 @@ const About = () => {
         transition={{ delay: 0.5 }}
         className="mb-16"
       >
-        <h2 className="text-3xl font-bold text-slate-800 text-center mb-12">
+        <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 text-center mb-8 sm:mb-12 px-4">
           What Makes Lighthouse Different
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-6 border border-blue-100">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center mb-4">
-              <Satellite className="text-white" size={24} />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-5 sm:p-6 border border-blue-100">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center mb-3 sm:mb-4">
+              <Satellite className="text-white" size={20} />
             </div>
-            <h3 className="text-xl font-bold text-slate-800 mb-3">Real NASA Satellite Data</h3>
-            <p className="text-slate-600 leading-relaxed">
+            <h3 className="text-lg sm:text-xl font-bold text-slate-800 mb-2 sm:mb-3">Real NASA Satellite Data</h3>
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
               Hourly updates from the TEMPO satellite, not city-wide estimates. Your exact neighborhood, down to ±1km accuracy.
             </p>
           </div>
