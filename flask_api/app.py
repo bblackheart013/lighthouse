@@ -208,17 +208,10 @@ def create_app() -> Flask:
     app = Flask(__name__)
     app.config['JSON_SORT_KEYS'] = config.JSON_SORT_KEYS
 
-    # Enable CORS for frontend integration
+    # Enable CORS for frontend integration (allow all origins for public API)
     CORS(app, resources={
         r"/*": {
-            "origins": [
-                "http://localhost:3000",
-                "http://localhost:5173",
-                "http://localhost:5174",
-                "http://localhost:5175",
-                "https://lighthouse-cadel3aal-bblackheart013s-projects.vercel.app",
-                "https://*.vercel.app"
-            ],
+            "origins": "*",
             "methods": ["GET", "POST", "OPTIONS"],
             "allow_headers": ["Content-Type"]
         }
