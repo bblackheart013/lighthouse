@@ -109,7 +109,7 @@ We integrate data from:
 ---
 
 ### Interactive Global Map
----<img width="912" height="1312" alt="Screenshot 2025-10-07 at 2 27 40 PM" src="https://github.com/user-attachments/assets/c45f2b1b-c8fc-4c91-8d9c-37d2952f1747" />
+<img width="3440" height="1440" alt="Screenshot 2025-10-07 at 2 26 43 PM" src="https://github.com/user-attachments/assets/d71298c3-1dfc-4e21-ac25-4946eb260732" />
 
 ---
 
