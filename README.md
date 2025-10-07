@@ -96,13 +96,14 @@ We integrate data from:
 <img width="912" height="1312" alt="Screenshot 2025-10-07 at 2 27 27 PM" src="https://github.com/user-attachments/assets/b53e303b-4573-4b39-b10e-44a529c8d501" />
 <img width="3440" height="1440" alt="Screenshot 2025-10-07 at 2 26 43 PM" src="https://github.com/user-attachments/assets/a5693948-cabf-457b-9c89-2acf7b1a0b27" />
 
+---
 
 ### Personalized Health Alerts!
 <img width="912" height="1312" alt="Screenshot 2025-10-07 at 2 30 13 PM" src="https://github.com/user-attachments/assets/77d2f632-7cc7-4787-adb4-f1cc4706bf2a" />
 
 ---
 
-### 7-Day ML-Powered Forecast
+### ML-Powered Forecast
 <img width="912" height="1312" alt="Screenshot 2025-10-07 at 2 28 22 PM" src="https://github.com/user-attachments/assets/04a0bf26-a5e1-410c-b0d9-76dfe46b6b23" />
 <img width="912" height="1312" alt="Screenshot 2025-10-07 at 2 28 13 PM" src="https://github.com/user-attachments/assets/697ca7c5-9c70-4505-a4f8-410d260568c2" />
 
