@@ -92,27 +92,29 @@ We integrate data from:
 <div align="center">
 
 ### Dashboard - Your Air Quality at a Glance
-*[Screenshot placeholder: Main dashboard with Breath Score, current conditions, and quick stats]*
 
----
+<img width="912" height="1312" alt="Screenshot 2025-10-07 at 2 27 27 PM" src="https://github.com/user-attachments/assets/b53e303b-4573-4b39-b10e-44a529c8d501" />
+<img width="3440" height="1440" alt="Screenshot 2025-10-07 at 2 26 43 PM" src="https://github.com/user-attachments/assets/a5693948-cabf-457b-9c89-2acf7b1a0b27" />
 
-### Personalized Health Alerts
-*[Screenshot placeholder: Alerts page showing warnings based on user health conditions]*
+
+### Personalized Health Alerts!
+<img width="912" height="1312" alt="Screenshot 2025-10-07 at 2 30 13 PM" src="https://github.com/user-attachments/assets/77d2f632-7cc7-4787-adb4-f1cc4706bf2a" />
 
 ---
 
 ### 7-Day ML-Powered Forecast
-*[Screenshot placeholder: Forecast page with prediction charts]*
+<img width="912" height="1312" alt="Screenshot 2025-10-07 at 2 28 22 PM" src="https://github.com/user-attachments/assets/04a0bf26-a5e1-410c-b0d9-76dfe46b6b23" />
+<img width="912" height="1312" alt="Screenshot 2025-10-07 at 2 28 13 PM" src="https://github.com/user-attachments/assets/697ca7c5-9c70-4505-a4f8-410d260568c2" />
 
 ---
 
 ### Interactive Global Map
-*[Screenshot placeholder: Map view showing pollution hotspots]*
+---<img width="912" height="1312" alt="Screenshot 2025-10-07 at 2 27 40 PM" src="https://github.com/user-attachments/assets/c45f2b1b-c8fc-4c91-8d9c-37d2952f1747" />
 
 ---
 
 ### Compare Any Cities Worldwide
-*[Screenshot placeholder: Side-by-side comparison of two cities]*
+<img width="912" height="1312" alt="Screenshot 2025-10-07 at 2 29 27 PM" src="https://github.com/user-attachments/assets/39bd6fdd-5a72-4d48-a163-5c4f9dedf8b0" />
 
 </div>
 
