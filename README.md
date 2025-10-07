@@ -129,7 +129,7 @@ We integrate data from:
 - **Tailwind CSS** - Utility-first styling
 - **Framer Motion** - Smooth animations
 - **Recharts** - Beautiful data visualization
-- **Leaflet** - Interactive maps
+- **MapBox** - Interactive maps
 - **Axios** - API communication
 
 ### Backend
