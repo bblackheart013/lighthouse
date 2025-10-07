@@ -86,10 +86,15 @@ curl "http://localhost:5000/ai-insights?lat=40.7&lon=-74.0&aqi=85"
 
 ## Configuration
 
-The API key is configured in `gemini_service.py`:
+The API key is configured in `gemini_service.py` using environment variables:
 
 ```python
-GEMINI_API_KEY = "AIzaSyBaSA-1bFG_4rxW3eh3O9Mteq6w6Xz4sqs"
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+```
+
+Add your API key to the `.env` file:
+```
+GEMINI_API_KEY=your-api-key-here
 ```
 
 **Model Used**: `gemini-2.5-flash` (stable, fast, and reliable)
